@@ -1,0 +1,21 @@
+{:source-paths
+ ["dev/src"
+  "src"]
+
+ :dependencies
+ [[lilactown/helix "0.1.6"]]
+ 
+ :dev-http {8082 "public"}
+
+ :builds
+ {:spring
+  {:target :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   :modules {:main
+             {:entries [helix.spring.basic]
+              :init-fn helix.spring.basic/init}}}
+  :storybook
+  {:target :npm-module
+   :entries [helix.spring-stories]
+   :output-dir "public/js/stories"}}}

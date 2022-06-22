@@ -1,0 +1,27 @@
+{
+  "name": "cljspring",
+  "version": "1.0.0",
+  "description": "\"Clojurescript wrapper for react-spring\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "storybook": "start-storybook",
+    "dev": "shadow-cljs watch spring",
+    "stories": "shadow-cljs watch storybook",
+    "dev-stories": "concurrently --kill-others \"npm run stories\" \"npm run storybook\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@react-spring/web": "^9.4.5",
+    "@storybook/react": "^6.5.9",
+    "@use-gesture/react": "^10.2.15",
+    "concurrently": "^7.2.1",
+    "framer-motion": "^6.3.11",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "react-spring": "^9.4.5",
+    "shadow-cljs": "^2.19.2",
+    "styled-components": "^5.3.5"
+  }
+}
