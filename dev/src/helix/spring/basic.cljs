@@ -1,9 +1,10 @@
 (ns helix.spring.basic
   (:require
+    ["react-dom" :as rdom]
     [helix.core :refer [defnc $]]
     [helix.dom :as d]
     [helix.spring :as spring]
-    ["react-dom" :as rdom]))
+    [helix.styled-components :refer [defstyled]]))
 
 
 (defnc Yellow []
@@ -11,6 +12,10 @@
                   {:from  {:opacity 0}
                    :to {:opacity 1}})]
     (spring/div {:style style} "DIDID")))
+
+
+(defstyled yellow Yellow
+  {:color "yellow"})
 
 (defnc Hello []
   (d/div

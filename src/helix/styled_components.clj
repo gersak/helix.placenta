@@ -4,6 +4,8 @@
     helix.placenta.util
     clojure.java.io))
 
+(declare defstyled)
+
 (defmacro defstyled
   "Macro takes style name component type and default style
   as input. In addition mixins can be used to compute additional
@@ -18,7 +20,7 @@
           (fn [~props-sym]
             (let [clj-props# (assoc 
                                (cljs-bean.core/->clj ~props-sym)
-                               :cljsc/component (symbol ~_ns '~cname))] 
+                               :helix.styled-components/component (symbol ~_ns '~cname))] 
               (cljs-bean.core/->js
                 (reduce 
                   helix.placenta.util/deep-merge

@@ -9,12 +9,14 @@
 (def styled sc)
 (def global-style createGlobalStyle)
 (def theme-provider ThemeProvider)
+(declare defstyled)
 
 
 (defmulti --themed
-  (fn [{:keys [theme cljsc/component]}]
+  (fn [{:keys [theme helix.styled-components/component]}]
     [theme component]))
 
+
 (defmethod --themed :default
-  [{:keys [theme cljsc/component]}]
+  [{:keys [theme helix.styled-components/component]}]
   (.warn js/console (str "Couldn't generate --themed mixin for [theme, component] " [theme  component])))
