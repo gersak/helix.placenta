@@ -1,5 +1,5 @@
 public/js/stories/
-node_modles/
+node_modules/
 public/js/
 .shadow-cljs/
 .clj-kondo/.cache/

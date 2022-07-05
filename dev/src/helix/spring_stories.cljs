@@ -1,6 +1,7 @@
 (ns helix.spring-stories
   (:require
     [helix.core :refer [$]]
+    [helix.dom :as d]
     [helix.spring.basic :as s]))
 
 
@@ -9,5 +10,8 @@
        :component s/Hello})
 
 
-(defn ^:export Hello []
+(defn ^:export BiloKak []
   ($ s/Hello))
+
+(defn ^:export ByBy []
+  (d/div "Pozdrav iz klasnicnog DOM-a"))
