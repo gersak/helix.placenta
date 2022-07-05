@@ -173,7 +173,8 @@
      (let [[v u] (spring/useSpring (if (fn? initial) initial (fn [] (b/->js initial))))
            handles (hooks/use-memo
                      [u]
-                     {:start #(.start u (b/->js %))
+                     {:start (fn [props]
+                               (.start u (b/->js props)))
                       :stop (fn stop
                               ([] (.stop u))
                               ([ks] (.stop u (b/->js ks))))
@@ -191,7 +192,7 @@
                        ([f x1] ((get handles f (:set handles)) (b/->js x1)))
                        ([f x1 x2] ((get handles f (:set handles)) (b/->js x1) (b/->js x2))))
                      ;; `u` is guaranteed to be stable so we elide it
-                     #js [])]
+                     #js [u])]
        [v updater])))
 
 

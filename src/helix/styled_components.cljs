@@ -1,8 +1,10 @@
 (ns helix.styled-components
   (:require-macros [helix.styled-components])
   (:require
+    [helix.core :refer [defhook]]
+    [helix.hooks :as hooks]
     ["styled-components"
-     :refer [default createGlobalStyle ThemeProvider]
+     :refer [default createGlobalStyle ThemeProvider useTheme]
      :rename {default sc}]))
 
 
@@ -15,6 +17,22 @@
 (defmulti --themed
   (fn [{:keys [theme helix.styled-components/component]}]
     [theme component]))
+
+
+(defmulti color (fn [theme name] [theme name]))
+
+
+(defmethod color :default
+  [theme name]
+  (.warn js/console (str "Color " name " wasn't found for theme: " theme))
+  "transparent")
+
+(defhook use-color
+  [color-name]
+  (let [theme-name (useTheme)]
+    (hooks/use-memo
+      [theme-name color-name]
+      (color theme-name color-name))))
 
 
 (defmethod --themed :default
