@@ -13,7 +13,6 @@
                    :to {:opacity 1}})]
     (spring/div {:style style} "DIDID")))
 
-
 (defstyled yellow Yellow
   {:color "yellow"})
 
