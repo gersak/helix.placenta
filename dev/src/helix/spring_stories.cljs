@@ -1,8 +1,8 @@
 (ns helix.spring-stories
   (:require
-    [helix.core :refer [$]]
-    [helix.dom :as d]
-    [helix.spring.basic :as s]))
+   [helix.core :refer [$]]
+   [helix.dom :as d]
+   [helix.spring.basic :as s]))
 
 
 (def ^:export default
@@ -15,3 +15,14 @@
 
 (defn ^:export ByBy []
   (d/div "Pozdrav iz klasnicnog DOM-a"))
+
+(defn ^:export ClickFadeOut []
+  ($ s/ClickFadeOut))
+
+(defn ^:export AmoTamo []
+  ($ s/AmoTamo))
+
+(defn ^:export Reload[]
+  ($ s/Reload))
+
+ ;; ())

@@ -1,13 +1,13 @@
 (ns helix.spring
   (:refer-clojure :exclude [map meta time])
   (:require
-    [helix.core :as hx]
-    [helix.impl.props :as impl.props]
-    [helix.spring.js :as spring.js]
-    #?(:cljs [helix.hooks :as hooks])
-    #?(:cljs [cljs-bean.core :as b])
-    #?(:cljs ["react-spring" :as spring])
-    #?(:cljs ["react" :as react]))
+   [helix.core :as hx]
+   [helix.impl.props :as impl.props]
+   [helix.spring.js :as spring.js]
+   #?(:cljs [helix.hooks :as hooks])
+   #?(:cljs [cljs-bean.core :as b])
+   #?(:cljs ["react-spring" :as spring])
+   #?(:cljs ["react" :as react]))
   #?(:cljs (:require-macros [helix.spring])))
 
 (declare
@@ -169,31 +169,37 @@
 
 #?(:cljs
    (defn use-spring
-     [initial]
-     (let [[v u] (spring/useSpring (if (fn? initial) initial (fn [] (b/->js initial))))
-           handles (hooks/use-memo
+     ([initial] (use-spring [] initial))
+     ([deps initial]
+      (let [[v u] (cond
+                    (fn? initial) (spring/useSpring (b/->js initial))
+                    (not-empty deps) (spring/useSpring (b/->js initial) deps)
+                    :else [(spring/useSpring (b/->js initial))])
+            handles (hooks/use-memo
                      [u]
-                     {:start (fn [props]
-                               (.start u (b/->js props)))
-                      :stop (fn stop
-                              ([] (.stop u))
-                              ([ks] (.stop u (b/->js ks))))
-                      :update #(.update u %)
-                      :set #(.set u (b/->js %))
-                      :pause (fn pause
-                               ([] (.pause u))
-                               ([ks] (.pause u (b/->js ks))))
-                      :rasume (fn rasume
-                                ([] (.rasume u))
-                                ([ks] (.rasume u (b/->js ks))))})
-           updater (react/useCallback
+                     (when u
+                       {:start (fn [props] (.start u (b/->js props)))
+                        :stop (fn stop
+                                ([] (.stop u))
+                                ([ks] (.stop u (b/->js ks))))
+                        :update #(.update u %)
+                        :set (fn [x] (.set u (b/->js x)))
+                        :pause (fn pause
+                                 ([] (.pause u))
+                                 ([ks] (.pause u (b/->js ks))))
+                        :rasume (fn rasume
+                                  ([] (.rasume u))
+                                  ([ks] (.rasume u (b/->js ks))))}))
+            updater (react/useCallback
                      (fn updater
-                       ([x] (u (b/->js x)))
-                       ([f x1] ((get handles f (:set handles)) (b/->js x1)))
+                       ([x] (if (keyword? x)
+                              (when-let [f (get handles x)] (f))
+                              (u (b/->js x))))
+                       ([f x1] (println f x1) ((get handles f (:set handles)) (b/->js x1)))
                        ([f x1 x2] ((get handles f (:set handles)) (b/->js x1) (b/->js x2))))
                      ;; `u` is guaranteed to be stable so we elide it
                      #js [u])]
-       [v updater])))
+        (if u [v updater] [v])))))
 
 
 #?(:clj (defn gen-tag
