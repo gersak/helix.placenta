@@ -171,10 +171,10 @@
    (defn use-spring
      ([initial] (use-spring [] initial))
      ([deps initial]
-      (let [[v u] (cond
-                    (fn? initial) (spring/useSpring (b/->js initial))
-                    (not-empty deps) (spring/useSpring (b/->js initial) deps)
-                    :else [(spring/useSpring (b/->js initial))])
+      (let [[^js v ^js u] (cond
+                            (fn? initial) (spring/useSpring (fn [] (b/->js (initial))))
+                            (not-empty deps) (spring/useSpring (b/->js initial) (b/->js deps))
+                            :else [(spring/useSpring (b/->js initial))])
             handles (hooks/use-memo
                      [u]
                      (when u
@@ -195,7 +195,7 @@
                        ([x] (if (keyword? x)
                               (when-let [f (get handles x)] (f))
                               (u (b/->js x))))
-                       ([f x1] (println f x1) ((get handles f (:set handles)) (b/->js x1)))
+                       ([f x1] ((get handles f (:set handles)) (b/->js x1)))
                        ([f x1 x2] ((get handles f (:set handles)) (b/->js x1) (b/->js x2))))
                      ;; `u` is guaranteed to be stable so we elide it
                      #js [u])]

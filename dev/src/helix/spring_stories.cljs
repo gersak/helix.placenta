@@ -25,4 +25,7 @@
 (defn ^:export Reload[]
   ($ s/Reload))
 
+(defn ^:export Flip[]
+  ($ s/Flip))
+
  ;; ())
