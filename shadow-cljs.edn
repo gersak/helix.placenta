@@ -17,5 +17,9 @@
               :init-fn helix.spring.basic/init}}}
   :storybook
   {:target :npm-module
-   :entries [helix.spring-stories]
+   :entries [helix.spring-stories
+             helix.spring1-stories
+             helix.spring2-stories
+             helix.spring3-stories
+             helix.spring4-stories]
    :output-dir "public/js/stories"}}}
