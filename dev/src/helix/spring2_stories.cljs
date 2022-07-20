@@ -6,7 +6,7 @@
 
 (def ^:export default
   #js {:title "Spring components/StartingExamples"
-       :component s/BiloKak})
+       :component s/Hello})
 
 (defn ^:export DinamicTextColorChange []
   ($ s/Hello))

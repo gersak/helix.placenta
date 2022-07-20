@@ -4,16 +4,28 @@
 
 
 (defn defstyled [{:keys [:node]}]
-  (let [[component-name component-parent & body] (rest (:children node))]
-    (when-not (and component-name component-parent)
+  (let [[cname ctype style & mixins] (rest (:children node))]
+    (when-not (and cname ctype)
       (throw
         (ex-info "Define both new component name and extended component"
-                 {:component component-name
-                  :extending component-parent})))
-    (let [new-node (api/list-node
-                     (list*
-                       (api/token-node 'def)
-                       (api/token-node component-name)
-                       body))]
+                 {:component cname
+                  :extending ctype})))
+    (let [new-node (if (not-empty mixins)
+                     (api/list-node
+                       (list
+                         (api/token-node 'def)
+                         cname
+                         (api/list-node
+                           (into
+                             [(api/list-node [(api/token-node 'helix.styled-components/styled) ctype])
+                              style]
+                             mixins))))
+                     (api/list-node
+                       (list
+                         (api/token-node 'def)
+                         cname
+                         (api/list-node
+                           [(api/list-node [(api/token-node 'helix.styled-components/styled)])
+                            ctype
+                            style]))))]
       {:node new-node})))
-

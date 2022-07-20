@@ -6,7 +6,19 @@
 
 (def ^:export default
   #js {:title "Spring components/Hover Triggered Animations"
-       :component s/BiloKak})
+       :component s/Hello})
 
 (defn ^:export HoverAnim []
   ($ s/change-hover-color))
+
+(defn ^:export HoverRotateImg []
+  ($ s/hover-rotate-img))
+
+#_(defn ^:export ImgZoomOut []
+  ($ s/ImgZoomOut))
+
+#_(defn ^:export TextExpand []
+  ($ s/ExpandButton))
+
+#_(defn ^:export ScaleDownSquare[]
+  ($ s/ScaleDownSquare))

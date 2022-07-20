@@ -166,6 +166,8 @@
                         nil
                         ~@args)))
 
+#?(:cljs (def animated spring/animated))
+
 
 #?(:cljs
    (defn use-spring

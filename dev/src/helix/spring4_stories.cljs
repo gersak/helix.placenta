@@ -6,7 +6,7 @@
 
 (def ^:export default
   #js {:title "Spring components/OnClick Triggered Animations"
-       :component s/BiloKak})
+       :component s/Hello})
 
 (defn ^:export WavyTextAppear []
   ($ s/Wave))
@@ -19,3 +19,9 @@
 
 (defn ^:export TextFadeOut []
   ($ s/ClickFadeOut))
+
+(defn ^:export sideWindowSlide []
+  ($ s/sideWindowSlide))
+
+(defn ^:export ExpandButton []
+  ($ s/expand-button))

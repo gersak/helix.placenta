@@ -6,26 +6,45 @@
 
 
 (def ^:export default
-  #js {:title "Spring components"
+  #js {:title "Spring components/SelfTriggeredAnimations"
        :component s/Hello})
 
+;(defn ^:export BiloKak []
+;  ($ s/Hello))
+;
+;(defn ^:export ByBy []
+;  (d/div "Pozdrav iz klasnicnog DOM-a"))
 
-(defn ^:export BiloKak []
-  ($ s/Hello))
+;(defn ^:export ClickFadeOut []
+; ($ s/ClickFadeOut))
 
-(defn ^:export ByBy []
-  (d/div "Pozdrav iz klasnicnog DOM-a"))
+;(defn ^:export AmoTamo []
+;  ($ s/AmoTamo))
+;
 
-(defn ^:export ClickFadeOut []
-  ($ s/ClickFadeOut))
+;(defn ^:export Reload[] 
+; ($ s/Reload))
 
-(defn ^:export AmoTamo []
-  ($ s/AmoTamo))
+;(defn ^:export Flip[]
+;  ($ s/flip-example))
 
-(defn ^:export Reload[]
-  ($ s/Reload))
+;(defn ^:export TrackCursor[]
+;  ($ s/TrackCursor))
 
-(defn ^:export Flip[]
-  ($ s/Flip))
 
+;(defn ^:export Wave[]
+;  ($ s/Wave))
+
+(defn ^:export ReappearingEmoji []
+  ($ s/DissapearReapear))
+
+;(defn ^:export LoadingRotation[]
+;  ($ s/LoadingRotation))
+
+
+(defn ^:export ChangeBgColor []
+  ($ s/change-bg-color))
+
+;(defn ^:export HoverAnim []
+;  ($ s/change-hover-color))
  ;; ())
