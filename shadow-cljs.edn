@@ -4,7 +4,7 @@
 
  :dependencies
  [[lilactown/helix "0.1.6"]]
- 
+
  :dev-http {8082 "public"}
 
  :builds
@@ -21,5 +21,10 @@
              helix.spring1-stories
              helix.spring2-stories
              helix.spring3-stories
-             helix.spring4-stories]
+             helix.spring4-stories
+             helix.virtual-stories
+             helix.virtual2-stories
+             helix.virtual3-stories
+             helix.virtual4-stories
+             helix.virtual5-stories]
    :output-dir "public/js/stories"}}}
