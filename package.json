@@ -32,12 +32,9 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@storybook/addon-controls": "^6.5.9",
     "@storybook/addon-docs": "^6.5.9",
-<<<<<<< HEAD
-    "react-icons-kit": "^2.0.0"
-=======
+    "react-icons-kit": "^2.0.0",
     "@tanstack/react-virtual": "^v3.0.0-beta.9",
     "konva": "^3.4.1",
     "react-konva": "^18.2.1"
->>>>>>> ca8eac607ca16ec83894c8d3cc45bcbb4be6ba4d
   }
 }
