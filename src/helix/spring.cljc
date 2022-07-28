@@ -152,19 +152,7 @@
     stop
     tspan])
 
-(defmacro $d
-  [type & args]
-  (if (map? (first args))
-    `^js/React.Element (.createElement
-                        (hx/get-react)
-                        (spring.js/get-animated ~type)
-                        (impl.props/dom-props ~(first args))
-                        ~@(rest args))
-    `^js/React.Element (.createElement
-                        (hx/get-react)
-                        (spring.js/get-animated ~type)
-                        nil
-                        ~@args)))
+
 
 #?(:cljs (def animated spring/animated))
 
@@ -204,16 +192,33 @@
         (if u [v updater] [v])))))
 
 
+(defmacro $d
+  [type & args]
+  (if (map? (first args))
+    `^js/React.Element (.createElement
+                        (hx/get-react)
+                        (spring.js/get-animated ~type)
+                        (impl.props/dom-props ~(first args))
+                        ~@(rest args))
+    `^js/React.Element (.createElement
+                        (hx/get-react)
+                        (spring.js/get-animated ~type)
+                        nil
+                        ~@args)))
+
+
 #?(:clj (defn gen-tag
           [tag]
-          ; (println "GENERATING TAG: " tag)
           `(defmacro ~tag [& args#]
              `($d ~(str '~tag) ~@args#))))
 
 #?(:clj (defmacro gen-tags
           []
           `(do
-             ~@(for [tag tags]
-                 (gen-tag tag)))))
+             ~@(for [tag tags] (gen-tag tag)))))
 
 #?(:clj (gen-tags))
+
+
+(comment
+  (macroexpand-1 '(gen-tags)))
