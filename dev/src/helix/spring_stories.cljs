@@ -45,6 +45,8 @@
 (defn ^:export ChangeBgColor []
   ($ s/change-bg-color))
 
+(defn ^:export TextTopAnim []
+  ($ s/text-top-anim))
 ;(defn ^:export HoverAnim []
 ;  ($ s/change-hover-color))
  ;; ())

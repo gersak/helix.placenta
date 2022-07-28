@@ -13,3 +13,6 @@
 
 (defn ^:export Rotation []
   ($ s/LoadingRotation))
+
+#_(defn ^:export PictureSlider []
+  ($ s/picture-slider))

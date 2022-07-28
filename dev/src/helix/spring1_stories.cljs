@@ -17,8 +17,20 @@
 #_(defn ^:export ImgZoomOut []
   ($ s/ImgZoomOut))
 
-#_(defn ^:export TextExpand []
-  ($ s/ExpandButton))
+(defn ^:export ImageTextHover []
+  ($ s/image-text-hover))
 
-#_(defn ^:export ScaleDownSquare[]
-  ($ s/ScaleDownSquare))
+#_(defn ^:export FunScroll []
+  ($ s/fun-scroll))
+
+(defn ^:export RaiseIconAnim []
+  ($ s/raise-icon-anim))
+
+(defn ^:export IconMovement []
+  ($ s/icon-movement))
+
+(defn ^:export HoverSocial []
+  ($ s/hover-social))
+
+(defn ^:export PopUpInfo []
+  ($ s/pop-up-info))

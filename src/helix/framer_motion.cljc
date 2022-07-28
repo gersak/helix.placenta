@@ -1,10 +1,11 @@
 (ns helix.framer-motion
   (:refer-clojure :exclude [map meta time])
   (:require
-    #?(:cljs ["framer-motion" :as motion])
-    [helix.core :as hx]
-    [helix.impl.props :as impl.props]
-    [helix.framer-motion.core :as fm])
+   #?(:cljs ["framer-motion" :as motion])
+   #?(:cljs [cljs-bean.core :as b])
+   [helix.core :as hx]
+   [helix.impl.props :as impl.props]
+   [helix.framer-motion.core :as fm])
   #?(:cljs (:require-macros [helix.framer-motion])))
 
 (declare
@@ -154,8 +155,8 @@
                                      (contains? m '&) '&
                                      (contains? m :&) :&)]
                  `(helix.impl.props/merge-obj
-                    ~(framer.motion/-dom-props (dissoc m spread-sym) (helix.impl.props/primitive-obj))
-                    (-dom-props ~(get m spread-sym)))
+                   ~(helix.framer-motion/-dom-props (dissoc m spread-sym) (helix.impl.props/primitive-obj))
+                   (-dom-props ~(get m spread-sym)))
                  (-dom-props m (helix.impl.props/primitive-obj)))
           :cljs (if (map? m)
                   (-dom-props m (helix.impl.props/primitive-obj))
@@ -190,7 +191,7 @@
     `^js/React.Element (.createElement
                         (hx/get-react)
                         (fm/get-motion ~type)
-                        (framer.motion/dom-props ~(first args))
+                        (helix.framer-motion/dom-props ~(first args))
                         ~@(rest args))
     `^js/React.Element (.createElement
                         (hx/get-react)
@@ -198,10 +199,7 @@
                         nil
                         ~@args)))
 
-
-#?(:cljs (defonce AnimatePresence motion/AnimatePresence))
-(comment
-  (.log js/console AnimatePresence))
+#?(:cljs (def variants b/->js))
 
 
 #?(:clj (defn gen-tag

@@ -203,6 +203,41 @@
                      #js [u])]
         (if u [v updater] [v])))))
 
+#?(:cljs
+   (defn use-trail
+     ([initial] (use-trail [] initial))
+     ([deps initial]
+      (let [[^js v ^js u] (cond
+                            (fn? initial) (spring/useTrail (fn [] (b/->js (initial))))
+                            (not-empty deps) (spring/useTrail (b/->js initial) (b/->js deps))
+                            :else [(spring/useTrail (b/->js initial))])
+            handles (hooks/use-memo
+                     [u]
+                     (when u
+                       {:start (fn [props] (.start u (b/->js props)))
+                        :stop (fn stop
+                                ([] (.stop u))
+                                ([ks] (.stop u (b/->js ks))))
+                        :update #(.update u %)
+                        :set (fn [x] (.set u (b/->js x)))
+                        :pause (fn pause
+                                 ([] (.pause u))
+                                 ([ks] (.pause u (b/->js ks))))
+                        :rasume (fn rasume
+                                  ([] (.rasume u))
+                                  ([ks] (.rasume u (b/->js ks))))}))
+            updater (react/useCallback
+                     (fn updater
+                       ([x] (if (keyword? x)
+                              (when-let [f (get handles x)] (f))
+                              (u (b/->js x))))
+                       ([f x1] ((get handles f (:set handles)) (b/->js x1)))
+                       ([f x1 x2] ((get handles f (:set handles)) (b/->js x1) (b/->js x2))))
+                     ;; `u` is guaranteed to be stable so we elide it
+                     #js [u])]
+        (if u [v updater] [v])))))
+
+
 
 #?(:clj (defn gen-tag
           [tag]

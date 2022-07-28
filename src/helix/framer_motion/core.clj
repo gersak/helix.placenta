@@ -1,1 +1,1 @@
-(ns helix.framer_motion.core)
+(ns helix.framer-motion.core)

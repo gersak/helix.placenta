@@ -23,5 +23,20 @@
 (defn ^:export sideWindowSlide []
   ($ s/sideWindowSlide))
 
+(defn ^:export OptionSelect []
+  ($ s/option-select))
+
 (defn ^:export ExpandButton []
   ($ s/expand-button))
+
+(defn ^:export AnimatedModal []
+  ($ s/animated-modal))
+
+(defn ^:export ToggleAnimTrail []
+  ($ s/toggle-anim-trail))
+
+(defn ^:export ItemsFadeout []
+  ($ s/items-fadeout))
+
+#_(defn ^:export SlidingLetters []
+  ($ s/sliding-letters))
