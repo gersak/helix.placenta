@@ -193,12 +193,10 @@
 
 #?(:cljs
    (defn use-trail
-     ([initial] (use-trail [] initial))
-     ([deps initial]
-      (let [[^js v ^js u] (cond
-                            (fn? initial) (spring/useTrail (fn [] (b/->js (initial))))
-                            (not-empty deps) (spring/useTrail (b/->js initial) (b/->js deps))
-                            :else [(spring/useTrail (b/->js initial))])
+     ([amount initial]
+      (let [[^js v ^js u] (if (fn? initial)
+                            (spring/useTrail amount (fn [] (b/->js (initial))))
+                            [(spring/useTrail amount (b/->js initial))])
             handles (hooks/use-memo
                      [u]
                      (when u

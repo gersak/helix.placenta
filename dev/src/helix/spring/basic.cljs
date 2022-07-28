@@ -1,11 +1,10 @@
 (ns helix.spring.basic
   (:require ["@fortawesome/react-fontawesome" :refer [FontAwesomeIcon]]
             ["@fortawesome/free-brands-svg-icons" :refer [faYoutube faDiscord faLinkedinIn faGithub]]
-            ["@fortawesome/free-solid-svg-icons" :refer [faCircleInfo]]
-            ["react-spring" :refer [config useSpring useTransition useTrail Transition]]
+            ["@fortawesome/free-solid-svg-icons" :refer [faCircleInfo faChevronDown]]
+            ["react-spring" :refer [config useSpring useTransition Transition]]
             ["react-use-measure" :default useMeasure] ;["@material-ui/icons/ExpandMore" :refer ExpandButton]
  ;[helix.spring.accordion :as acc]
-            ["@fortawesome/free-solid-svg-icons" :refer [faChevronDown]] ;["styled-components" :refer [styled]]
             ["@use-gesture/react" :refer [useScroll]] ;["@material-ui/icons/ExpandMore" :refer ExpandButton]
             [goog.object]
             [cljs-bean.core :refer [->js]] ;;https://github.com/mfikes/cljs-bean/blob/master/src/cljs_bean/core.cljs - ugrađeno nešto - mi to tu koristimo 
@@ -956,34 +955,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#_(defnc StringFadeOut []
-    (let [items ["Item1" "Item2" "Item3" "Item4"]
-          config {:mass 5
-                  :tension 2000
-                  :friction 200}
-          [toggle set] (hooks/use-state true)
-          trail (useTrail (count items) {:config config
-                                         :opacity (if toggle 1 0)
-                                         :x (if toggle 0 20)
-                                         :height (if toggle 80 0)
-                                         :from {:opacity 0
-                                                :x 20
-                                                :height 0}})
-          height (.-height trail)]
-      (d/div
-       {:onClick (fn []
-                   (set not))}
-       (d/div
-        {. trail map (fn [[x height]])}
-        (spring/div
-         (def key))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1718,122 +1690,65 @@
 
 
 ;https://codesandbox.io/s/trailing-transition-pu3yp?file=/src/index.tsx
+
 (def itemsHelper "one
                   two
                   three")
 (def items (string/split-lines itemsHelper))
 
 (defnc ToggleAnimTrail [{:keys [className]}]
-  (let [[isHidden setHidden] (hooks/use-state false)
-        trail (useTrail
-               (count items)
-               (->js {:opacity (if isHidden 0 1)}))
-        toggle (fn []
-                 (setHidden not))]
-    (.log js/console "TRAIL: " trail)
-    (.log js/console "COUNT ITEMS: " (count items))
-    (d/div
-     {:className className}
-     (d/section
-      (d/button
-       {:onClick toggle}
-       "TOGGLE")
-      (d/ul
-       (map-indexed
-        (fn [idx obj]
-          (.log js/console "Object: " idx obj)
-          (let [item (get items idx)]
-            (.log js/console "ITEM: " item)
-            (.log js/console "OPACITY: " (.-opacity obj))
-            (spring/li
-             {:style obj
-              :key item}
-             item)))
-        trail))))))
+    (let [[isHidden setHidden] (hooks/use-state false)
+          [trail] (spring/use-trail
+                 (count items)
+                 {:opacity (if isHidden 0 1)})
+          toggle (fn []
+                   (setHidden not))]
+      (.log js/console "TRAIL: " trail)
+      (.log js/console "COUNT ITEMS: " (count items))
+      (d/div
+       {:className className}
+       (d/section
+        (d/button
+         {:onClick toggle}
+         "TOGGLE")
+        (d/ul
+         (map-indexed
+          (fn [idx obj]
+            (.log js/console "Object: " idx obj)
+            (let [item (get items idx)]
+              (.log js/console "ITEM: " item)
+              (.log js/console "OPACITY: " (.-opacity obj))
+              (spring/li
+               {:style obj
+                :key item}
+               item)))
+          trail))))))
 
 (defstyled toggle-anim-trail ToggleAnimTrail
-  {:width "100%"
-   :height "100vh"
-   :display "flex"
-   :justify-content "center"
-   :background "black"
-   "section" {:display "flex"
-              :flex-direction "column"
-              :justify-content "center"
-              :align-items "center"}
-   "button" {:margin-bottom "16px"
-             :padding "8px 16px"
-             :border "1px solid white"
-             :background "transparent"
-             :letter-spacing "0.1em"
-             :cursor "pointer"}
-   "ul" {:list-style "none"}
-   "li" {:margin-bottom "8px"}
-   "*" {:box-sizing "border-box"
-        :margin 0
-        :padding 0
-        :color "white"
-        :font-family "monospace"
-        :font-size "16px"}})
+    {:width "100%"
+     :height "100vh"
+     :display "flex"
+     :justify-content "center"
+     :background "black"
+     "section" {:display "flex"
+                :flex-direction "column"
+                :justify-content "center"
+                :align-items "center"}
+     "button" {:margin-bottom "16px"
+               :padding "8px 16px"
+               :border "1px solid white"
+               :background "transparent"
+               :letter-spacing "0.1em"
+               :cursor "pointer"}
+     "ul" {:list-style "none"}
+     "li" {:margin-bottom "8px"}
+     "*" {:box-sizing "border-box"
+          :margin 0
+          :padding 0
+          :color "white"
+          :font-family "monospace"
+          :font-size "16px"}})
 
-;(def itemsHelper "one
-;                  two
-;                  three")
-;(def items (string/split-lines itemsHelper))
-;
-;(defnc ToggleAnimTrail [{:keys [className]}]
-;    (let [[isHidden setHidden] (hooks/use-state false)
-;          trail (spring/use-trail
-;                 (count items)
-;                 (->js {:opacity (if isHidden 0 1)}))
-;          toggle (fn []
-;                   (setHidden not))]
-;      (.log js/console "TRAIL: " trail)
-;      (.log js/console "COUNT ITEMS: " (count items))
-;      (d/div
-;       {:className className}
-;       (d/section
-;        (d/button
-;         {:onClick toggle}
-;         "TOGGLE")
-;        (d/ul
-;         (map-indexed
-;          (fn [idx obj]
-;            (.log js/console "Object: " idx obj)
-;            (let [item (get items idx)]
-;              (.log js/console "ITEM: " item)
-;              (.log js/console "OPACITY: " (.-opacity obj))
-;              (spring/li
-;               {:style obj
-;                :key item}
-;               item)))
-;          trail))))))
-;
-;(defstyled toggle-anim-trail ToggleAnimTrail
-;    {:width "100%"
-;     :height "100vh"
-;     :display "flex"
-;     :justify-content "center"
-;     :background "black"
-;     "section" {:display "flex"
-;                :flex-direction "column"
-;                :justify-content "center"
-;                :align-items "center"}
-;     "button" {:margin-bottom "16px"
-;               :padding "8px 16px"
-;               :border "1px solid white"
-;               :background "transparent"
-;               :letter-spacing "0.1em"
-;               :cursor "pointer"}
-;     "ul" {:list-style "none"}
-;     "li" {:margin-bottom "8px"}
-;     "*" {:box-sizing "border-box"
-;          :margin 0
-;          :padding 0
-;          :color "white"
-;          :font-family "monospace"
-;          :font-size "16px"}})
-;
 
 (def itemsHelper2 "ITEM1
                   ITEM2
@@ -1844,7 +1759,7 @@
 (defnc ItemsFadeout [{:keys [className]}]
   (let [[toggle set] (hooks/use-state true)
         items (string/split-lines itemsHelper2)
-        trail (useTrail (count items) (->js {:config {:mass 5
+        [trail] (spring/use-trail (count items) {:config {:mass 5
                                                       :tension 2000
                                                       :friction 200}
                                              :opacity (if toggle 1 0)
@@ -1852,7 +1767,7 @@
                                              :height (if toggle 80 0)
                                              :from {:opacity 0
                                                     :x 20
-                                                    :height 0}}))
+                                                    :height 0}})
         ;mora se prebaciti u js jer koristimo njihovu funkciju (nije napisana u clj)
         ]
     (.log js/console "TRAIL: " trail)
