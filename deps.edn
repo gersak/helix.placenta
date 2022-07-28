@@ -1,6 +1,8 @@
 {:deps 
  {cljs-bean/cljs-bean             {:mvn/version "1.7.0"}
-  lilactown/helix                 {:mvn/version "0.1.5"}}
+  lilactown/helix                 {:mvn/version "0.1.5"}
+  org.clojure/clojurescript       {:mvn/version "1.11.60"}
+  }
 
  :paths ["src" "resources"]
  :aliases

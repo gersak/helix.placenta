@@ -2,12 +2,15 @@
   (:require
    [helix.core :refer [$]]
    [helix.dom :as d]
+   [helix.konva :as konva]
    [helix.spring.basic :as s]))
 
 
 (def ^:export default
   #js {:title "Spring components/SelfTriggeredAnimations"
        :component s/Hello})
+
+
 
 ;(defn ^:export BiloKak []
 ;  ($ s/Hello))
@@ -50,3 +53,12 @@
 ;(defn ^:export HoverAnim []
 ;  ($ s/change-hover-color))
  ;; ())
+
+
+
+(defn ^:export Konva []
+  (konva/Stage
+    {:width 200 :height 200}
+    (konva/Layer
+      (konva/Text
+        {:text "Hello from KONVA"}))))
