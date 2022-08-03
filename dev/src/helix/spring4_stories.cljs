@@ -6,22 +6,22 @@
 
 (def ^:export default
   #js {:title "Spring components/OnClick Triggered Animations"
-       :component s/Hello})
+       :component s/Reload})
 
 (defn ^:export WavyTextAppear []
   ($ s/Wave))
 
 (defn ^:export FlipSides []
-  ($ s/flip-example))
+  ($ s/flip-container))
 
 (defn ^:export Charging []
-  ($ s/Reload))
+  ($ s/reload-container))
 
 (defn ^:export TextFadeOut []
-  ($ s/ClickFadeOut))
+  ($ s/click-fade-out))
 
 (defn ^:export sideWindowSlide []
-  ($ s/sideWindowSlide))
+  ($ s/sideWindowSlide)) 
 
 (defn ^:export OptionSelect []
   ($ s/option-select))
@@ -38,5 +38,11 @@
 (defn ^:export ItemsFadeout []
   ($ s/items-fadeout))
 
-#_(defn ^:export SlidingLetters []
+(defn ^:export SlidingLetters []
   ($ s/sliding-letters))
+
+(defn ^:export EmojiTransitions []
+  ($ s/emoji-transitions))
+
+#_(defn ^:export CubeSpread []
+  ($ s/cube-spread))

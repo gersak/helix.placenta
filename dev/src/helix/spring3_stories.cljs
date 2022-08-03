@@ -6,13 +6,10 @@
 
 (def ^:export default
   #js {:title "Spring components/SelfTriggeredAnimations/MovingSquares"
-       :component s/Hello})
+       :component s/AmoTamo})
 
 (defn ^:export DiagonalMovement []
   ($ s/AmoTamo))
 
 (defn ^:export Rotation []
   ($ s/LoadingRotation))
-
-#_(defn ^:export PictureSlider []
-  ($ s/picture-slider))

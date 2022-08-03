@@ -6,7 +6,7 @@
 
 (def ^:export default
   #js {:title "Spring components/Hover Triggered Animations"
-       :component s/Hello})
+       :component s/change-hover-color})
 
 (defn ^:export HoverAnim []
   ($ s/change-hover-color))
@@ -20,9 +20,6 @@
 (defn ^:export ImageTextHover []
   ($ s/image-text-hover))
 
-#_(defn ^:export FunScroll []
-  ($ s/fun-scroll))
-
 (defn ^:export RaiseIconAnim []
   ($ s/raise-icon-anim))
 
@@ -34,3 +31,6 @@
 
 (defn ^:export PopUpInfo []
   ($ s/pop-up-info))
+
+(defn ^:export StandOutCardApp []
+  ($ s/stand-out-card))

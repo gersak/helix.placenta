@@ -8,53 +8,19 @@
 
 (def ^:export default
   #js {:title "Spring components/SelfTriggeredAnimations"
-       :component s/Hello})
-
-
-
-;(defn ^:export BiloKak []
-;  ($ s/Hello))
-;
-;(defn ^:export ByBy []
-;  (d/div "Pozdrav iz klasnicnog DOM-a"))
-
-;(defn ^:export ClickFadeOut []
-; ($ s/ClickFadeOut))
-
-;(defn ^:export AmoTamo []
-;  ($ s/AmoTamo))
-;
-
-;(defn ^:export Reload[] 
-; ($ s/Reload))
-
-;(defn ^:export Flip[]
-;  ($ s/flip-example))
-
-;(defn ^:export TrackCursor[]
-;  ($ s/TrackCursor))
-
-
-;(defn ^:export Wave[]
-;  ($ s/Wave))
+       :component s/dissapear-reapear})
 
 (defn ^:export ReappearingEmoji []
-  ($ s/DissapearReapear))
-
-;(defn ^:export LoadingRotation[]
-;  ($ s/LoadingRotation))
-
+  ($ s/dissapear-reapear))
 
 (defn ^:export ChangeBgColor []
   ($ s/change-bg-color))
 
 (defn ^:export TextTopAnim []
   ($ s/text-top-anim))
-;(defn ^:export HoverAnim []
-;  ($ s/change-hover-color))
- ;; ())
 
-
+(defn ^:export ImgIterate []
+  ($ s/img-iterate))
 
 (defn ^:export Konva []
   (konva/Stage
