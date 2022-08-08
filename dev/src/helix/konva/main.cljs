@@ -270,13 +270,6 @@
                          (if (or (< (.-width newBox) 5) (< (.-height newBox) 5))
                            oldBox newBox))})))))
 
-(defn DownloadURI2 [uri, name]
-  (let [link (.createElement js/document "a")]
-    #(swap! (.-download link) name)
-    #(swap! (.-href link) uri)
-    (.appendChild (.-body js/document) link)
-    (.click link)
-    (.removeChild (.-body js/document) link)))
 
 (defnc ImageTransformer []
   (let [[image-load] (use-image "https://konvajs.org/assets/yoda.jpg" "anonymous")
@@ -312,7 +305,7 @@
             images)
        #_(.log js/console images))))))
 
-; Export image (kinda works, returns base64 string of image)
+; Export image (returns base64 string of image)
 
 (defn DownloadURI [uri, name]
   (let [link (.createElement js/document "a")]
@@ -493,7 +486,7 @@
                (d/label {:for "simple-slider"
                          :className "label"} (str "  " state "%")))))))
 
-; Simple avatar editor testing (combined image export and transform)
+; Simple avatar editor (combined image export and transform) - rotate, drag, zoom
 
 (defn HandleScroll [e, zooming,  set-zoom]
   (let [scale-by 1.02
@@ -514,11 +507,12 @@
        (.nodes ^js  @trRef #js [@shapeRef])
        (.batchDraw ^js (.getLayer @trRef))))
     (<>
-     (.log js/console (if (= (:image shapeProps) js/undefined)
-                        (.log js/console "is undefined")
-                        (.log js/console (.-width (:image shapeProps)))))
+     #_(.log js/console (if (= (:image shapeProps) js/undefined)
+                          (.log js/console "is undefined")
+                          (.log js/console (.-width (:image shapeProps)))))
      (konva/Image
-      {:image (:image shapeProps),
+      {:& shapeProps,
+       :image (:image shapeProps),
        :width (:width shapeProps),
        :height (:height shapeProps),
        :rotation rotation,
@@ -534,21 +528,20 @@
        :y (if (= (:image shapeProps) js/undefined)
             0
             250)
-       :scaleX zooming,
-       :scaleY zooming,
-       :onClick (fn [e] (onSelect (.. e -target -value))),
+       :scaleX (* zooming (if (= (:image shapeProps) js/undefined)
+                            (:width shapeProps)
+                            (if (> (.-width (:image shapeProps)) (.-height (:image shapeProps)))
+                              (/ 500 (.-width (:image shapeProps)))
+                              (/ 500 (.-height (:image shapeProps)))))),
+       :scaleY (* zooming (if (= (:image shapeProps) js/undefined)
+                            (:width shapeProps)
+                            (if (> (.-width (:image shapeProps)) (.-height (:image shapeProps)))
+                              (/ 500 (.-width (:image shapeProps)))
+                              (/ 500 (.-height (:image shapeProps)))))),
+       :onClick (fn [e] (onSelect (.. e -target))),
        :ref #(reset! shapeRef %),
        :draggable true,
-       :centeredScaling true,
        :onWheel (fn [e] (HandleScroll e zooming set-zoom))
-       ;(fn [e]
-       ;  (let [scale-by 1.02
-       ;              old-scale zooming
-       ;              #_mouse-point-to #_{:x (- (/ (.-x (.getPointerPosition stage)) old-scale) (/ (.-x stage) old-scale))
-       ;                                  :y (- (/ (.-y (.getPointerPosition stage)) old-scale) (/ (.-y stage) old-scale))}
-       ;              new-scale (if (and (< (.-deltaY (.-evt e)) 0) (< old-scale 3)) (* old-scale scale-by) (/ old-scale scale-by))]
-       ;          (.preventDefault (.-evt e))
-       ;          (set-zoom new-scale)))
        :onDragMove (fn [e]
                      (let [node ^js @shapeRef]
                        ->js (onChange
@@ -584,7 +577,7 @@
 ; small (yoda) image https://konvajs.org/assets/yoda.jpg
 
 (defnc AvatarEditor []
-  (let [[image-load] (use-image "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1920px-Image_created_with_a_mobile_phone.png" "anonymous")
+  (let [[image-load] (use-image "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png/800px-Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png" "anonymous")
         [images set-images] (hooks/use-state [])
         [selected select!] (hooks/use-state nil)
         stage-ref (hooks/use-ref nil)
@@ -610,6 +603,14 @@
                                      :else false)]
                                (when (= clickedOnEmpty true) (select! nil))))}
              (konva/Layer
+              #_(konva/Circle
+                 {:x 250,
+                  :y 250,
+                  :radius 250,
+                  :fill "",
+                  :stroke "black",
+                  :strokeWidth 5,
+                  :style {:z-index "10"}})
 
               (map (fn [imgg]
                      (.log js/console imgg)
@@ -631,7 +632,19 @@
                            (DownloadURI (.toDataURL (.-current stage-ref)), "slika.png")
                            (.log js/console (.toDataURL (.-current stage-ref))))} (str "Click to log URI"))
      (d/button {:onClick (fn []
-                           (set-images [{:image image-load}])
+                           (set-images [{:image image-load,
+                                         :offsetX (if (= image-load js/undefined)
+                                                    0
+                                                    (/ (.-width image-load) 2)) #_(.-width (:image shapeProps)),
+                                         :offsetY (if (= image-load js/undefined)
+                                                    0
+                                                    (/ (.-height image-load) 2)) #_(.-height (:img shapeProps)),
+                                         :x (if (= image-load js/undefined) ; manually calculated for stage 500x500 (numberOfPixels / 2)
+                                              0
+                                              250),
+                                         :y (if (= image-load js/undefined)
+                                              0
+                                              250)}])
                            (set-zoom 1)
                            (set-rotate 0))} (str "Reset"))
      (d/br)
