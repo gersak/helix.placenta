@@ -96,7 +96,7 @@
                    {:className "innerElement",
                     :style {:height (str (.getTotalSize rowVirtualizer) "px")}}
                    (map
-                    (fn [virtualItem]
+                    (fn [^js virtualItem]
                       (d/div
                        {:className "visibleItems",
                         :key (.-index virtualItem),
@@ -126,7 +126,7 @@
                    {:style {:width (str (.getTotalSize columnVirualizer) "px")},
                     :className "innerElement"}
                    (map
-                    (fn [virtualItem]
+                    (fn [^js virtualItem]
                       (d/div
                        {:key (.-index virtualItem),
                         :style {:width (str (.-size virtualItem) "px"),
@@ -164,10 +164,10 @@
                     :style {:width (str (.getTotalSize columnVirualizer) "px"),
                             :height (str (.getTotalSize rowVirtualizer) "px")}}
                    (map
-                    (fn [virtualRow]
+                    (fn [^js virtualRow]
                       < {:key (.-index virtualRow)} >
                       (map
-                       (fn [virtualColumn]
+                       (fn [^js virtualColumn]
                          (d/div
                           {:key (.-index virtualColumn),
                            :className "visibleItems",
@@ -254,7 +254,7 @@
                    {:style {:height (str (.getTotalSize rowVirtualizer) "px")},
                     :className "innerElement"}
                    (map
-                    (fn [virtualItem]
+                    (fn [^js virtualItem]
                       (d/div
                        {:key (.-index virtualItem),
                         :className "visibleItems",
@@ -287,7 +287,7 @@
                    {:style {:width (str (.getTotalSize columnVirualizer) "px")},
                     :className "innerElement"}
                    (map
-                    (fn [virtualItem]
+                    (fn [^js virtualItem]
                       (d/div
                        {:key (.-index virtualItem),
                         :className "visibleItems"
@@ -330,7 +330,7 @@
                     (fn [virtualRow]
                       < {:key (.-index virtualRow)} >
                       (map
-                       (fn [virtualColumn]
+                       (fn [^js virtualColumn]
                          (d/div
                           {:key (.-index virtualColumn),
                            :className "visibleItems",
@@ -417,7 +417,7 @@
                    {:className "innerElement",
                     :style {:height (.getTotalSize rowVirtualizer)}}
                    (map
-                    (fn [virtualItem]
+                    (fn [^js virtualItem]
                       (d/div
                        {:key (.-index virtualItem),
                         :ref (.-measureElement virtualItem),
@@ -450,7 +450,7 @@
                    {:style {:width (.getTotalSize columnVirualizer)},
                     :className "innerElement"}
                    (map
-                    (fn [virtualItem]
+                    (fn [^js virtualItem]
                       (d/div
                        {:key (.-index virtualItem),
                         :ref (.-measureElement virtualItem),
@@ -489,10 +489,10 @@
                             :height (.getTotalSize rowVirtualizer)},
                     :className "innerElement"}
                    (map
-                    (fn [virtualRow]
+                    (fn [^js  virtualRow]
                       < {:key (.-index virtualRow)} >
                       (map
-                       (fn [virtualColumn]
+                       (fn [^js  virtualColumn]
                          (d/div
                           {:key (.-index virtualColumn),
                            :ref (fn [el] (.measureElement virtualRow el)
@@ -576,7 +576,7 @@
               (d/div {:className "innerElement",
                       :style {:height (str (.getTotalSize windowVirtualizer) "px")}}
                      (map
-                      (fn [virtualItem]
+                      (fn [^js virtualItem]
                         (d/div {:ref (.-measureElement virtualItem),
                                 :key (.-key virtualItem),
                                 :className "visibleItems",
@@ -609,7 +609,7 @@
               (d/div {:className "innerElement",
                       :style {:width (str (.getTotalSize windowVirtualizer) "px")}}
                      (map
-                      (fn [virtualItem]
+                      (fn [^js virtualItem]
                         (d/div {:ref (.-measureElement virtualItem),
                                 :key (.-key virtualItem),
                                 :className "visibleItems",
@@ -637,10 +637,10 @@
                       :style {:width (str (.getTotalSize columnVirtualizer) "px"),
                               :height (str (.getTotalSize rowVirtualizer) "px")}}
                      (map
-                      (fn [virtualRow]
+                      (fn [^js virtualRow]
                         < {:key (.-index virtualRow)} >
                         (map
-                         (fn [virtualColumn]
+                         (fn [^js virtualColumn]
                            (d/div {:key (.-index virtualColumn),
                                    :className "visibleItems",
                                    :style {:width (str (.-size virtualColumn) "px"),
@@ -725,7 +725,7 @@
                                         :style {:width (str (.getTotalSize columnVirtualizer)  "px")}}
                                        (d/tr
                                         (map
-                                         (fn [virtualColumn]
+                                         (fn [^js virtualColumn]
                                            (d/th {:key (.-index virtualColumn)
                                                   :className "header__item",
                                                   :style {:height "100%",
@@ -737,11 +737,11 @@
                                                 :height (str (.getTotalSize rowVirtualizer) "px"),
                                                 :position "relative"}}
                                        (map
-                                        (fn [virtualRow]
+                                        (fn [^js virtualRow]
                                           (d/tr {:key (.-index virtualRow),
                                                  :className "table-row"}
                                                 (map
-                                                 (fn [virtualColumn]
+                                                 (fn [^js virtualColumn]
                                                    (d/td {:key (.-index virtualColumn),
                                                           :className "table-data",
                                                           :style {:width (str (.-size virtualColumn) "px"),
@@ -798,11 +798,11 @@
                                                 :height (str (.getTotalSize rowVirtualizer) "px"),
                                                 :position "relative"}}
                                        (map
-                                        (fn [virtualRow]
+                                        (fn [^js virtualRow]
                                           (d/tr {:className "table-row",
                                                  :key (.-index virtualRow)}
                                                 (map
-                                                 (fn [virtualColumn]
+                                                 (fn [^js virtualColumn]
                                                    (d/td
                                                     {:key (.-index virtualColumn),
                                                      :className "table-data",

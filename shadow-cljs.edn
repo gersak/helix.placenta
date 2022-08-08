@@ -8,23 +8,12 @@
  :dev-http {8082 "public"}
 
  :builds
- {:spring
-  {:target :browser
-   :output-dir "public/js"
-   :asset-path "/js"
-   :modules {:main
-             {:entries [helix.spring.basic]
-              :init-fn helix.spring.basic/init}}}
-  :storybook
+ {:storybook
   {:target :npm-module
-   :entries [helix.spring-stories
-             helix.spring1-stories
-             helix.spring2-stories
-             helix.spring3-stories
-             helix.spring4-stories
-             helix.virtual-stories
+   :entries [helix.virtual-stories
              helix.virtual2-stories
              helix.virtual3-stories
              helix.virtual4-stories
-             helix.virtual5-stories]
+             helix.virtual5-stories
+             helix.konva-stories]
    :output-dir "public/js/stories"}}}
