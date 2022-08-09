@@ -1,7 +1,6 @@
 (ns helix.konva-stories
   (:require
    [helix.core :refer [$]]
-   [helix.dom :as d]
    [helix.konva.main :as kon]))
 
 
