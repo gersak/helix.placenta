@@ -156,19 +156,19 @@
                             :x (.x (.-target e)),
                             :y (.y (.-target e))}))
        :onTransformEnd (fn []
-                         (let [node @shapeRef
-                               scaleX ^js (.scaleX node)
-                               scaleY ^js (.scaleY node)]
-                           ^js (.scaleX node 1)
-                           ^js (.scaleY node 1)
-                           ->js (onChange {:fill (:fill shapeProps),
-                                           :id (:id shapeProps),
-                                           :x #_150 (.x node),
-                                           :y #_150 (.y node),
-                                           :width #_250 (* (.width node) scaleX)
-                                           :height #_250 (* (.height node) scaleY)})
+                         (let [node ^js @shapeRef
+                               scaleX (.scaleX node)
+                               scaleY (.scaleY node)]
+                           (.scaleX node 1)
+                           (.scaleY node 1)
+                           (onChange {:fill (:fill shapeProps),
+                                      :id (:id shapeProps),
+                                      :x #_150 (.x node),
+                                      :y #_150 (.y node),
+                                      :width #_250 (* (.width node) scaleX)
+                                      :height #_250 (* (.height node) scaleY)})
                            #_(.log js/console scaleX)))})
-     (when (= isSelected true)
+     (when isSelected
        (konva/Transformer
         {:ref #(reset! trRef %)
          :boundBoxFunc (fn [oldBox, newBox]
@@ -219,6 +219,7 @@
                                       (selectShape (:id rect)))
                           :onChange (fn [newAttrs]
                                       #_(.log js/console (nth rectangles 1))
+                                      #_(setRectangles update rectangles (.indexOf rectangles rect) merge newAttrs)
                                       (setRectangles (assoc rectangles (.indexOf rectangles rect) newAttrs)))}))
                     rectangles))))))
 
@@ -441,7 +442,7 @@
   {".slidercontainer" {:width "25%"},
    ".slider" {:-webkit-appearance "none",
               :appearance "none",
-              :width "75%",
+              :width "70%",
               :height "15px",
               :border-radius "5px",
               :background "#d3d3d3",
@@ -488,28 +489,22 @@
 
 ; Simple avatar editor (combined image export and transform) - rotate, drag, zoom
 
-(defn HandleScroll [e, zooming,  set-zoom]
+(defn HandleScroll [^js e, zooming,  set-zoom]
   (let [scale-by 1.02
         old-scale zooming
-        #_mouse-point-to #_{:x (- (/ (.-x (.getPointerPosition stage)) old-scale) (/ (.-x stage) old-scale))
-                            :y (- (/ (.-y (.getPointerPosition stage)) old-scale) (/ (.-y stage) old-scale))}
         new-scale (if (< (.-deltaY (.-evt e)) 0) (* old-scale scale-by) (/ old-scale scale-by))]
     (set-zoom new-scale)))
 
 (defnc AvatarRender [{:keys [shapeProps, selected, onSelect, onChange, rotation, zooming, set-zoom]}]
-  (let [shapeRef (hooks/use-ref nil)
-        trRef (hooks/use-ref nil)
-        isSelected (= selected @shapeRef)]
-    #_(.log js/console shapeProps)
+  (let [shape-ref (hooks/use-ref nil)
+        tr-ref (hooks/use-ref nil)
+        isSelected (= selected @shape-ref)]
     (hooks/use-effect
      [isSelected]
      (when (= isSelected true)
-       (.nodes ^js  @trRef #js [@shapeRef])
-       (.batchDraw ^js (.getLayer @trRef))))
+       (.nodes ^js  @tr-ref #js [@shape-ref])
+       (.batchDraw ^js (.getLayer @tr-ref))))
     (<>
-     #_(.log js/console (if (= (:image shapeProps) js/undefined)
-                          (.log js/console "is undefined")
-                          (.log js/console (.-width (:image shapeProps)))))
      (konva/Image
       {:& shapeProps,
        :image (:image shapeProps),
@@ -539,36 +534,36 @@
                               (/ 500 (.-width (:image shapeProps)))
                               (/ 500 (.-height (:image shapeProps)))))),
        :onClick (fn [e] (onSelect (.. e -target))),
-       :ref #(reset! shapeRef %),
+       :ref #(reset! shape-ref %),
        :draggable true,
        :onWheel (fn [e] (HandleScroll e zooming set-zoom))
        :onDragMove (fn [e]
-                     (let [node ^js @shapeRef]
-                       ->js (onChange
-                             {:image (:image shapeProps),
-                              :width (.width node),
-                              :height (.height node),
-                              :x (.x (.-target e)),
-                              :y (.y (.-target e))})))
+                     (let [node ^js @shape-ref]
+                       (onChange
+                        {:image (:image shapeProps),
+                         :width (.width node),
+                         :height (.height node),
+                         :x (.x (.-target e)),
+                         :y (.y (.-target e))})))
        :onTransformEnd (fn []
-                         (let [node ^js @shapeRef
+                         (let [node ^js @shape-ref
                                scaleX ^js (.scaleX node)
                                scaleY ^js (.scaleY node)]
                            (.scaleX node 1)
                            (.scaleY node 1)
-                           ->js (onChange {:image (:image shapeProps),
-                                           :x #_150 (.x node),
-                                           :y #_150 (.y node),
-                                           :width #_250 (max 10, * (.width node) scaleX)
-                                           :height #_250 (max 10, * (.height node) scaleY)}))
+                           (onChange {:image (:image shapeProps),
+                                      :x #_150 (.x node),
+                                      :y #_150 (.y node),
+                                      :width #_250 (max 10, * (.width node) scaleX)
+                                      :height #_250 (max 10, * (.height node) scaleY)}))
                          #_(.log js/console scaleX))})
      (when (= isSelected true)
        (konva/Transformer
-        {:ref #(reset! trRef %),
+        {:ref #(reset! tr-ref %),
          :centeredScaling true,
-         :boundBoxFunc (fn [oldBox, newBox]
-                         (if (or (< (.-width newBox) 5) (< (.-height newBox) 5))
-                           oldBox newBox))})))))
+         :boundBoxFunc (fn [old-box, new-box]
+                         (if (or (< (.-width new-box) 5) (< (.-height new-box) 5))
+                           old-box new-box))})))))
 
 
 
@@ -585,16 +580,18 @@
         [zoom set-zoom] (hooks/use-state 1)]
     (hooks/use-effect
      [image-load]
-     (do (.log js/console image-load) (set-images [{:image image-load}]))
-     #_(when (not= image-load js/undefined) (setImages [image-load])))
-    #_(when (and (= (count images) 0) (not= image-load js/undefined))
-        (setImages (conj images image-load)))
+     (do (.log js/console image-load) (set-images [{:image image-load}])))
+
     (<>
-     (d/div {:style {:width "502px"}}
+     (d/div {:style {:width "502px"
+                     :background "grey"}}
             (konva/Stage
              {:width 500 #_(.-innerWidth js/window),
               :height 500 #_(.-innerHeight js/window),
-              :style {:border "1px solid black"}
+              :style {:border "1px solid black",
+                      :borderRadius "250px",
+                      :overflow "hidden"
+                      :background "white"}
               :ref #(reset! stage-ref %),
               :onMouseDown (fn [e]
                              (let [clickedOnEmpty
@@ -603,24 +600,14 @@
                                      :else false)]
                                (when (= clickedOnEmpty true) (select! nil))))}
              (konva/Layer
-              #_(konva/Circle
-                 {:x 250,
-                  :y 250,
-                  :radius 250,
-                  :fill "",
-                  :stroke "black",
-                  :strokeWidth 5,
-                  :style {:z-index "10"}})
-
               (map (fn [imgg]
                      (.log js/console imgg)
                      ($ AvatarRender
                         {:shapeProps imgg
                          :selected selected
                          :onSelect (fn [ref] (select! ref))
-                         :onChange (fn [newAttrs]
-                                     #_(.log js/console (nth rectangles 1))
-                                     (set-images (assoc images (.indexOf images imgg) newAttrs)))
+                         :onChange (fn [new-attrs]
+                                     (set-images (assoc images (.indexOf images imgg) new-attrs)))
                          :rotation rotate
                          :zooming zoom
                          :set-zoom set-zoom}))
@@ -659,7 +646,7 @@
         (d/div {:className "slidercontainer"}
                (d/label {:for "rotation-slider",
                          :className "label"}
-                        "Rotation  ")
+                        "Rotation ")
                (d/input
                 {:id "rotation-slider",
                  :name "rotation-slider",
@@ -668,16 +655,16 @@
                  :max "359",
                  :value rotate,
                  :className "slider",
-                 :style {:width "70%"}
                  :onChange (fn [e]
                              (set-rotate (.-value (.-target e))))})
                (d/label {:for "rotation-slider"
-                         :className "label"} (str "  " rotate "°")))
+                         :className "label"}
+                        (str "  " rotate "°")))
         (d/br)
         (d/div {:className "slidercontainer"}
                (d/label {:for "zoom-slider",
                          :className "label"}
-                        (str "Zooming   "))
+                        "Zooming ")
                (d/input
                 {:id "zoom-slider",
                  :name "zoom-slider",
@@ -687,8 +674,8 @@
                  :step 0.01,
                  :value zoom,
                  :className "slider",
-                 :style {:width "70%"}
                  :onChange (fn [e]
                              (set-zoom (.-value (.-target e))))})
                (d/label {:for "zoom-slider"
-                         :className "label"} (str "  " (int (* zoom 100)) "%")))))))
+                         :className "label"}
+                        (str "  " (int (* zoom 100)) "%")))))))
