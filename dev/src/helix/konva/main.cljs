@@ -310,8 +310,9 @@
 
 (defn DownloadURI [uri, name]
   (let [link (.createElement js/document "a")]
-    #(swap! (.-download link) name)
-    #(swap! (.-href link) uri)
+    (.log js/console link)
+    #_(->js (.-download link name))
+    #_(->js (.-href link uri))
     (.appendChild (.-body js/document) link)
     (.click link)
     (.removeChild (.-body js/document) link)))
@@ -571,6 +572,16 @@
 ; large horizontal image https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1920px-Image_created_with_a_mobile_phone.png
 ; small (yoda) image https://konvajs.org/assets/yoda.jpg
 
+
+(defn DownloadURI2 [uri, name, mime]
+  (let [link (doto (.createElement js/document "a")
+               (set! -download name)
+               (set! -href uri)
+               (set! -type mime))]
+    (.appendChild (.-body js/document) link)
+    (.click link)
+    (.removeChild (.-body js/document) link)))
+
 (defnc AvatarEditor []
   (let [[image-load] (use-image "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png/800px-Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png" "anonymous")
         [images set-images] (hooks/use-state [])
@@ -615,9 +626,9 @@
               #_(.log js/console images))))
 
      (d/button {:onClick (fn []
-                           (.log js/console (.-height image-load))
-                           (DownloadURI (.toDataURL (.-current stage-ref)), "slika.png")
-                           (.log js/console (.toDataURL (.-current stage-ref))))} (str "Click to log URI"))
+                           (DownloadURI2 (.toDataURL (.-current stage-ref)), "user-avatar.png", "image/png")
+                           (.log js/console (.toDataURL (.-current stage-ref))))}
+               (str "Download/log URI"))
      (d/button {:onClick (fn []
                            (set-images [{:image image-load,
                                          :offsetX (if (= image-load js/undefined)
