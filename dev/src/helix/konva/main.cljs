@@ -485,7 +485,7 @@
 
 
 (defnc AvatarRender
-  [{:keys [selected, onSelect, onChange, zooming, set-zoom]
+  [{:keys [selected onSelect onChange zooming set-zoom]
     {:keys [width image] :as avatar} :avatar}]
   (let [shapeRef (hooks/use-ref nil)
         trRef (hooks/use-ref nil)
@@ -501,7 +501,7 @@
     (when image
       (<>
         (konva/Image
-          {:& ,avatar
+          {:& avatar
            :offsetX (if image (/ (.-width image) 2) 0)
            :offsetY (if image (/ (.-height image) 2) 0)
            :x (if image 250 0)
@@ -553,10 +553,10 @@
 
 (defnc AvatarEditor []
   (let [[image-load] (use-image "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png/800px-Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png" "anonymous")
-        [{:keys [image] :as avatar} set-avatar!] (hooks/use-state nil)
+        [{:keys [image rotation] :as avatar
+          :or {rotation 0}} set-avatar!] (hooks/use-state nil)
         [selected select!] (hooks/use-state nil)
         stage-ref (hooks/use-ref nil)
-        [rotate set-rotate] (hooks/use-state 0)
         [zoom set-zoom] (hooks/use-state 1)]
     (hooks/use-effect
       [image-load]
@@ -576,20 +576,19 @@
             ($ AvatarRender
                {:avatar avatar
                 :selected selected
-                :onSelect (fn [ref] (println "AVATAR SELECTING") (select! ref))
-                :onChange (fn [delta] (set-avatar! update delta))
-                :rotation rotate
+                :onSelect (fn [ref] (select! ref))
+                :onChange (fn [delta] (set-avatar! merge delta))
                 :zooming zoom
                 :set-zoom set-zoom}))
           (konva/Layer
             (konva/Rect
-              {:x 0
-               :y 0
-               :cornerRadius 50
+              {:x -50 
+               :y -50
+               :cornerRadius 200
                :listening false
-               :width 500
-               :height 500
-               :strokeWidth 50,
+               :width 600
+               :height 600
+               :strokeWidth 130,
                :stroke "#000000bb"
                :style {:z-index "10"}}))))
       (d/button
@@ -605,43 +604,44 @@
                                   (/ (.-width image-load) 2))
                        :offsetY (if (= image-load js/undefined) 0
                                   (/ (.-height image-load) 2))
+                       :rotation 0
                        ; manually calculated for stage 500x500 (numberOfPixels / 2)
                        :x (if (= image-load js/undefined) 0
                             250),
                        :y (if (= image-load js/undefined) 0
                             250)})
-                    (set-zoom 1)
-                    (set-rotate 0))}
+                    (set-zoom 1))}
         (str "Reset"))
       (d/br)
       (d/br)
       (d/button
-        {:onClick (fn [] (set-rotate (if (> (- rotate 90) 0) (- rotate 90) 0)))}
+        {:onClick (fn [] (set-avatar! assoc :rotation (if (> (- rotation 90) 0) (- rotation 90) 0)))}
         "Left")
       (d/button
-        {:onClick (fn [] (set-rotate (if (< (+ rotate 90) 360) (+ rotate 90) 360)))}
+        {:onClick (fn [] (set-avatar! assoc :rotation (if (< (+ rotation 90) 360) (+ rotation 90) 360)))}
         "Right")
 
       ($ SliderCSS
          (d/br)
          (d/div
            {:className "slidercontainer"}
-           (d/label {:for "rotation-slider",
-                     :className "label"}
-                    "Rotation  ")
+           (d/label
+             {:for "rotation-slider",
+              :className "label"}
+             "Rotation  ")
            (d/input
              {:id "rotation-slider",
               :name "rotation-slider",
               :type "range",
               :min "0",
               :max "359",
-              :value rotate,
+              :value rotation,
               :className "slider",
               :style {:width "70%"}
-              :onChange (fn [e] (set-rotate (.-value (.-target e))))})
+              :onChange (fn [e] (set-avatar! assoc :rotation (or (.-value (.-target e)) 0)))})
            (d/label
              {:for "rotation-slider"
-              :className "label"} (str "  " rotate "°")))
+              :className "label"} (str "  " rotation "°")))
          (d/br)
          (d/div
            {:className "slidercontainer"}
