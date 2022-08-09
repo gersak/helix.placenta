@@ -281,6 +281,15 @@
 
 ; Export image (returns base64 string of image)
 
+(defn DownloadURI [uri, name]
+  (let [link (.createElement js/document "a")]
+    (.log js/console link)
+    #_(->js (.-download link name))
+    #_(->js (.-href link uri))
+    (.appendChild (.-body js/document) link)
+    (.click link)
+    (.removeChild (.-body js/document) link)))
+
 (defnc ExportImage []
   (let [width (/ (.-innerWidth js/window) 2)
         height (/ (.-innerHeight js/window) 2)
@@ -550,6 +559,16 @@
 ; vertical image https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png/800px-Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png
 ; large horizontal image https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1920px-Image_created_with_a_mobile_phone.png
 ; small (yoda) image https://konvajs.org/assets/yoda.jpg
+
+
+(defn DownloadURI2 [uri, name, mime]
+  (let [link (doto (.createElement js/document "a")
+               (set! -download name)
+               (set! -href uri)
+               (set! -type mime))]
+    (.appendChild (.-body js/document) link)
+    (.click link)
+    (.removeChild (.-body js/document) link)))
 
 (defnc AvatarEditor []
   (let [[image-load] (use-image "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png/800px-Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png" "anonymous")
