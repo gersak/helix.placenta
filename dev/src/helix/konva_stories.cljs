@@ -38,5 +38,5 @@
   ($ kon/SliderTesting))
 
 (defn ^:export AvatarEditor []
-  ($ kon/AvatarEditor))
+  ($ kon/avatar-editor))
 
