@@ -513,7 +513,7 @@
             (some? @shape-ref))
        (onSelect @shape-ref)))
     (when image
-      #_(.log js/console (:width avatar))
+      #_(.log js/console (.-width image))
       (<>
        (konva/Image
         {:& avatar
@@ -533,16 +533,17 @@
                        :else (* (.-height image) (/ 500 (.-height image))))
          ;:scaleX zooming
          ;:scaleY zooming
-         :scaleX (* zooming
-                    (cond
-                      (nil? image) width
-                      panorama? (/ 500 (.-width image))
-                      :else (/ 500 (.-height image)))),
-         :scaleY (* zooming
-                    (cond
-                      (nil? image) width
-                      panorama? (/ 500 (.-width image))
-                      :else (/ 500 (.-height image)))),
+         :scaleX #_zooming (* zooming
+                              (cond
+                                (nil? image) width
+                                panorama? (/ 500 (.-width image))
+                                :else (/ 500 (.-height image)))),
+         :scaleY #_zooming (* zooming
+                              (cond
+                                (nil? image) width
+                                panorama? (/ 500 (.-width image))
+                                :else (/ 500 (.-height image)))),
+
          :onClick (fn [e] (onSelect (.. e -target))),
          :ref #(reset! shape-ref %),
          :draggable true,
@@ -560,8 +561,8 @@
                                  scaleY (.scaleY node)]
                              (.scaleX node 1)
                              (.scaleY node 1)
-                             #_(.log js/console scaleX)
-                             #_(set-zoom (* zooming (* scaleX (/ (.-width image) 500))))
+                             #_(.log js/console (* zooming (/ scaleX (/ 500 (.-height image)))))
+                             #_(set-zoom (* zooming scaleY))
                              (onChange {:x (.x node),
                                         :y (.y node),
                                         #_:scaleX #_(* zooming
@@ -572,10 +573,8 @@
                                                        (cond
                                                          panorama? (/ 500 (* (.-height image) scaleY))
                                                          :else (/ 500 (* (.-width image) scaleX)))),
-                                        :width (max 10 (* (.-width image) scaleX))
-                                        :height (max 10 (* (.-height image) scaleY))
-                                        ;:scaleX (* (/ (.-width image) 250) scaleX)
-                                        ;:scaleY (* (/ (.-height image) 250) scaleY)
+                                        :width (max 10 (* (.width node) scaleX))
+                                        :height (max 10 (* (.height node) scaleY))
                                         :offsetX (/ (max 10 (* (.width node) scaleX)) 2)
                                         :offsetY (/ (max 10 (* (.height node) scaleY)) 2)})))})
        (when selected?
@@ -618,7 +617,7 @@
                     :border "2px solid teal"}})
 
 (defnc avatar-editor []
-  (let [[image-load] (use-image "https://konvajs.org/assets/yoda.jpg" "anonymous")
+  (let [[image-load] (use-image "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png/800px-Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png" "anonymous")
         [{:keys [image rotation] :as avatar
           :or {rotation 0}} set-avatar!] (hooks/use-state nil)
         [selected select!] (hooks/use-state nil)
