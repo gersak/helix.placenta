@@ -579,6 +579,21 @@
     (.click link)
     (.removeChild (.-body js/document) link)))
 
+(defstyled ButtonCSS "div"
+  {".button" {:background-color "teal"
+              :border "2px solid white"
+              :color "white"
+              :padding "10px 24px"
+              :text-align "center"
+              :text-decoration "none"
+              :font-size "15px"
+              :transition-duration "0.3s"
+              :margin "1px"
+              :border-radius "5px"}
+   ".button:hover" {:background-color "white"
+                    :color "teal"
+                    :border "2px solid teal"}})
+
 (defnc AvatarEditor []
   (let [[image-load] (use-image "https://konvajs.org/assets/yoda.jpg" "anonymous")
         [{:keys [image rotation] :as avatar
@@ -620,43 +635,48 @@
           :strokeWidth 130,
           :stroke "#000000bb"
           :style {:z-index "10"}}))))
-     (d/button
-      {:onClick (fn []
-                  (let [tr-elements (.-children (nth (.-children (.-current stage-ref)) 0))
-                        rect-elements (.-children (nth (.-children (.-current stage-ref)) 1))]
-                    (cond (= (count tr-elements) 2)
-                          (.hide (nth tr-elements 1)))
-                    (.hide (nth rect-elements 0))
-                    (DownloadURI2 (.toDataURL (.-current stage-ref)), "user-avatar.png", "image/png")
-                    (.log js/console (.toDataURL (.-current stage-ref)))
-                    (.show (nth rect-elements 0))
-                    (cond (= (count tr-elements) 2)
-                          (.show (nth tr-elements 1)))))}
-      (str "Download/log URI"))
-     (d/button
-      {:onClick (fn []
-                  (set-avatar!
-                   {:image image-load,
-                    :offsetX (if (= image-load js/undefined) 0
-                                 (/ (.-width image-load) 2))
-                    :offsetY (if (= image-load js/undefined) 0
-                                 (/ (.-height image-load) 2))
-                    :rotation 0
+     ($ ButtonCSS
+        (d/button
+         {:className "button"
+          :onClick (fn []
+                     (let [tr-elements (.-children (nth (.-children (.-current stage-ref)) 0))
+                           rect-elements (.-children (nth (.-children (.-current stage-ref)) 1))]
+                       (cond (= (count tr-elements) 2)
+                             (.hide (nth tr-elements 1)))
+                       (.hide (nth rect-elements 0))
+                       (DownloadURI2 (.toDataURL (.-current stage-ref)), "user-avatar.png", "image/png")
+                       (.log js/console (.toDataURL (.-current stage-ref)))
+                       (.show (nth rect-elements 0))
+                       (cond (= (count tr-elements) 2)
+                             (.show (nth tr-elements 1)))))}
+         (str "Download/log URI"))
+        (d/button
+         {:className "button"
+          :onClick (fn []
+                     (set-avatar!
+                      {:image image-load,
+                       :offsetX (if (= image-load js/undefined) 0
+                                    (/ (.-width image-load) 2))
+                       :offsetY (if (= image-load js/undefined) 0
+                                    (/ (.-height image-load) 2))
+                       :rotation 0
                        ; manually calculated for stage 500x500 (numberOfPixels / 2)
-                    :x (if (= image-load js/undefined) 0
-                           250),
-                    :y (if (= image-load js/undefined) 0
-                           250)})
-                  (set-zoom 0.5))}
-      (str "Reset"))
-     (d/br)
-     (d/br)
-     (d/button
-      {:onClick (fn [] (set-avatar! assoc :rotation (if (> (- rotation 90) 0) (- rotation 90) 0)))}
-      "Left")
-     (d/button
-      {:onClick (fn [] (set-avatar! assoc :rotation (if (< (+ rotation 90) 360) (+ rotation 90) 360)))}
-      "Right")
+                       :x (if (= image-load js/undefined) 0
+                              250),
+                       :y (if (= image-load js/undefined) 0
+                              250)})
+                     (set-zoom 0.5))}
+         (str "Reset"))
+        (d/br)
+        (d/br)
+        (d/button
+         {:className "button"
+          :onClick (fn [] (set-avatar! assoc :rotation (if (> (- rotation 90) 0) (- rotation 90) 0)))}
+         "Left")
+        (d/button
+         {:className "button"
+          :onClick (fn [] (set-avatar! assoc :rotation (if (< (+ rotation 90) 360) (+ rotation 90) 360)))}
+         "Right"))
 
      ($ SliderCSS
         (d/br)
