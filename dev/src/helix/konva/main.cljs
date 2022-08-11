@@ -149,14 +149,16 @@
                        :x (.x (.-target e)),
                        :y (.y (.-target e))}))
        :onTransformEnd (fn []
-                         (let [node ^js @shapeRef]
+                         (let [node ^js @shapeRef
+                               scaleX (.scaleX node)
+                               scaleY (.scaleY node)]
                            (.scaleX node 1)
                            (.scaleY node 1)
                            (onChange
                             {:x (.x node),
                              :y (.y node),
-                             :width (* (.width node) (.scaleX node))
-                             :height (* (.height node) (.scaleY node))})))})
+                             :width (* (.width node) scaleX)
+                             :height (* (.height node) scaleY)})))})
      (when selected?
        (konva/Transformer
         {:ref #(reset! trRef %)
@@ -481,18 +483,8 @@
 
 ; Simple avatar editor (combined image export and transform) - rotate, drag, zoom
 
-(defn handle-scroll
-  [^js e, zooming,  set-zoom]
-  (let [scale-by 1.02
-        old-scale zooming
-        new-scale (if (< (.-deltaY (.-evt e)) 0)
-                    (* old-scale scale-by)
-                    (/ old-scale scale-by))]
-    (set-zoom new-scale)))
-
-
 (defnc avatar-render
-  [{:keys [selected onSelect onChange zooming set-zoom]
+  [{:keys [selected onSelect onChange]
     {:keys [width image] :as avatar} :avatar}]
   (let [shape-ref (hooks/use-ref nil)
         tr-ref (hooks/use-ref nil)
@@ -513,7 +505,6 @@
             (some? @shape-ref))
        (onSelect @shape-ref)))
     (when image
-      #_(.log js/console (.-width image))
       (<>
        (konva/Image
         {:& avatar
@@ -521,39 +512,24 @@
          :offsetY (if image (/ (.-height image) 2) 0)
          :x (if image 250 0)
          :y (if image 250 0)
-         ;:x (if image (- 250 (/ (.-width image) 2)) 0)
-         ;:y (if image (- 250 (/ (.-height image) 2)) 0)
-         #_:width #_(cond
-                      (nil? image) width
-                      panorama? (* (.-width image) (/ 500 (.-width image)))
-                      :else (* (.-height image) (/ 500 (.-height image))))
-         #_:height #_(cond
-                       (nil? image) width
-                       panorama? (* (.-width image) (/ 500 (.-width image)))
-                       :else (* (.-height image) (/ 500 (.-height image))))
-         ;:scaleX zooming
-         ;:scaleY zooming
-         :scaleX #_zooming (* zooming
-                              (cond
-                                (nil? image) width
-                                panorama? (/ 500 (.-width image))
-                                :else (/ 500 (.-height image)))),
-         :scaleY #_zooming (* zooming
-                              (cond
-                                (nil? image) width
-                                panorama? (/ 500 (.-width image))
-                                :else (/ 500 (.-height image)))),
-
-         :onClick (fn [e] (onSelect (.. e -target))),
-         :ref #(reset! shape-ref %),
-         :draggable true,
-         :onWheel (fn [e] (handle-scroll e zooming set-zoom))
+         :scaleX (cond
+                   (nil? image) 0
+                   panorama? (/ 500 (.-width image))
+                   :else (/ 500 (.-height image)))
+         :scaleY (cond
+                   (nil? image) 0
+                   panorama? (/ 500 (.-width image))
+                   :else (/ 500 (.-height image)))
+         :onClick (fn [e] (onSelect (.. e -target)))
+         :ref #(reset! shape-ref %)
+         :draggable true
+         :rotation 0
          :onDragMove (fn [e]
                        (let [node ^js @shape-ref]
                          (onChange
-                          {:width (.width node),
-                           :height (.height node),
-                           :x (.x (.-target e)),
+                          {:width (.width node)
+                           :height (.height node)
+                           :x (.x (.-target e))
                            :y (.y (.-target e))})))
          :onTransformEnd (fn []
                            (let [node ^js @shape-ref
@@ -561,18 +537,8 @@
                                  scaleY (.scaleY node)]
                              (.scaleX node 1)
                              (.scaleY node 1)
-                             #_(.log js/console (* zooming (/ scaleX (/ 500 (.-height image)))))
-                             #_(set-zoom (* zooming scaleY))
-                             (onChange {:x (.x node),
-                                        :y (.y node),
-                                        #_:scaleX #_(* zooming
-                                                       (cond
-                                                         panorama? (/ 500 (* (.-width image) scaleX))
-                                                         :else (/ 500 (* (.-height image) scaleY)))),
-                                        #_:scaleY #_(* zooming
-                                                       (cond
-                                                         panorama? (/ 500 (* (.-height image) scaleY))
-                                                         :else (/ 500 (* (.-width image) scaleX)))),
+                             (onChange {:x (.x node)
+                                        :y (.y node)
                                         :width (max 10 (* (.width node) scaleX))
                                         :height (max 10 (* (.height node) scaleY))
                                         :offsetX (/ (max 10 (* (.width node) scaleX)) 2)
@@ -581,6 +547,7 @@
          (konva/Transformer
           {:ref #(reset! tr-ref %),
            :centeredScaling true,
+           :rotateEnabled false,
            :boundBoxFunc (fn [old-box, new-box]
                            (if (or (< (.-width new-box) 5) (< (.-height new-box) 5))
                              old-box new-box))}))))))
@@ -601,6 +568,15 @@
     (.click link)
     (.removeChild (.-body js/document) link)))
 
+(defn handle-scroll
+  [^js e, layer-zoom,  set-layer-zoom]
+  (let [scale-by 1.02
+        old-scale layer-zoom
+        new-scale (if (< (.-deltaY (.-evt e)) 0)
+                    (* old-scale scale-by)
+                    (/ old-scale scale-by))]
+    (set-layer-zoom new-scale)))
+
 (defstyled button-css "div"
   {".button" {:background-color "teal"
               :border "2px solid white"
@@ -617,12 +593,12 @@
                     :border "2px solid teal"}})
 
 (defnc avatar-editor []
-  (let [[image-load] (use-image "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png/800px-Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png" "anonymous")
+  (let [[image-load] (use-image "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1920px-Image_created_with_a_mobile_phone.png" "anonymous")
         [{:keys [image rotation] :as avatar
           :or {rotation 0}} set-avatar!] (hooks/use-state nil)
         [selected select!] (hooks/use-state nil)
         stage-ref (hooks/use-ref nil)
-        [zoom set-zoom] (hooks/use-state 0.5)]
+        [layer-zoom set-layer-zoom] (hooks/use-state 0.5)]
     (hooks/use-effect
      [image-load]
      (set-avatar! {:image image-load}))
@@ -638,13 +614,18 @@
                        (when (= (.-target e) (.getStage (.-target e)))
                          (select! nil)))}
        (konva/Layer
+        {:x 250
+         :y 250
+         :offsetX 250
+         :offsetY 250
+         :scaleX layer-zoom
+         :scaleY layer-zoom
+         :onWheel (fn [e] (handle-scroll e layer-zoom set-layer-zoom))}
         ($ avatar-render
            {:avatar avatar
             :selected selected
             :onSelect (fn [ref] (select! ref))
-            :onChange (fn [delta] (set-avatar! merge delta))
-            :zooming zoom
-            :set-zoom set-zoom}))
+            :onChange (fn [delta] (set-avatar! merge delta))}))
        (konva/Layer
         (konva/Rect
          {:x -50
@@ -675,29 +656,41 @@
         (d/button
          {:className "button"
           :onClick (fn []
-                     (set-avatar!
-                      {:image image-load,
-                       :offsetX (if (= image-load js/undefined) 0
-                                    (/ (.-width image-load) 2))
-                       :offsetY (if (= image-load js/undefined) 0
-                                    (/ (.-height image-load) 2))
-                       :rotation 0
+                     (set-avatar! merge
+                                  {:image image-load
+                                   #_:offsetX #_(if (= image-load js/undefined) 0
+                                                    (/ (.-width image-load) 2))
+                                   #_:offsetY #_(if (= image-load js/undefined) 0
+                                                    (/ (.-height image-load) 2))
+
+                                   :rotation 0
+                                   #_:width #_250 #_(.-width image-load)
+                                   #_:height #_250 #_(.-height image-load)
+                                   :scaleX (cond
+                                             (> (.-width image-load) (.-height image-load)) (/ 500 (.-width image-load))
+                                             :else (/ 500 (.-height image-load)))
+                                   :scaleY (cond
+                                             (> (.-width image-load) (.-height image-load)) (/ 500 (.-width image-load))
+                                             :else (/ 500 (.-height image-load)))
+                                   :x (if (= image-load js/undefined) 0
+                                          250)
+                                   :y (if (= image-load js/undefined) 0
+                                          250)
                        ; manually calculated for stage 500x500 (numberOfPixels / 2)
-                       :x (if (= image-load js/undefined) 0
-                              250),
-                       :y (if (= image-load js/undefined) 0
-                              250)})
-                     (set-zoom 0.5))}
-         (str "Reset"))
+                                   })
+                     (set-layer-zoom 0.5))}
+         (str "Re-center"))
         (d/br)
         (d/br)
         (d/button
          {:className "button"
-          :onClick (fn [] (set-avatar! assoc :rotation (if (> (- rotation 90) 0) (- rotation 90) 0)))}
+          :onClick (fn []
+                     (set-avatar! assoc :rotation (if (> (- rotation 90) 0) (- rotation 90) 0)))}
          "Left")
         (d/button
          {:className "button"
-          :onClick (fn [] (set-avatar! assoc :rotation (if (< (+ rotation 90) 360) (+ rotation 90) 360)))}
+          :onClick (fn []
+                     (set-avatar! assoc :rotation (if (< (+ rotation 90) 360) (+ rotation 90) 360)))}
          "Right"))
 
      ($ slider-css
@@ -735,11 +728,11 @@
            :min "0.01",
            :max "3",
            :step 0.01,
-           :value zoom,
+           :value layer-zoom,
            :className "slider",
            :style {:width "70%"}
-           :onChange (fn [e] (set-zoom (.-value (.-target e))))})
+           :onChange (fn [e] (set-layer-zoom (.-value (.-target e))))})
          (d/label
           {:for "zoom-slider"
            :className "label"}
-          (str "  " (int (* zoom 100)) "%")))))))
+          (str "  " (int (* layer-zoom 100)) "%")))))))
