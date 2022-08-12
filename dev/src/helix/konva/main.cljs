@@ -1,6 +1,7 @@
 (ns helix.konva.main
   (:require
    [helix.core :refer [defnc $ <>]]
+   [cljs-bean.core :refer [->js]]
    [helix.hooks :as hooks]
    [helix.dom :as d]
    [helix.styled-components :refer [defstyled]]
@@ -535,6 +536,8 @@
                            (let [node ^js @shape-ref
                                  scaleX (.scaleX node)
                                  scaleY (.scaleY node)]
+                             (.scaleX node 1)
+                             (.scaleY node 1)
                              (onChange {:x (.x node)
                                         :y (.y node)
                                         :scaleX 1
@@ -551,7 +554,6 @@
            :boundBoxFunc (fn [old-box, new-box]
                            (if (or (< (.-width new-box) 5) (< (.-height new-box) 5))
                              old-box new-box))}))))))
-
 
 
 ; vertical image https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png/800px-Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png
@@ -593,12 +595,13 @@
                     :border "2px solid teal"}})
 
 (defnc avatar-editor []
-  (let [[image-load] (use-image "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1920px-Image_created_with_a_mobile_phone.png" "anonymous")
-        [{:keys [image rotation] :as avatar
+  (let [[{:keys [image rotation] :as avatar
           :or {rotation 0}} set-avatar!] (hooks/use-state nil)
         [selected select!] (hooks/use-state nil)
         stage-ref (hooks/use-ref nil)
-        [layer-zoom set-layer-zoom] (hooks/use-state 0.5)]
+        [layer-zoom set-layer-zoom] (hooks/use-state 0.5)
+        [file set-file] (hooks/use-state nil)
+        [image-load] (use-image file "anonymous")]
     (hooks/use-effect
      [image-load]
      (set-avatar! {:image image-load}))
@@ -677,6 +680,18 @@
                                    :y (if (= image-load js/undefined) 0
                                           250)}))}
          (str "Reset"))
+        (d/input {:id "input"
+                  :name "input"
+                  :type "file"
+                  :accept ".png, .jpg, .jpeg, .svg"
+                  :onChange (fn [e]
+                              (cond (not (nil? (-> e .-target .-files)))
+                                    (let [URL (.-URL js/window)
+                                          url (.createObjectURL URL (-> e .-target .-files (aget 0)))
+                                          img (doto (.createElement js/document "img")
+                                                (set! -src url))]
+                                      (set-file (.-src img)))))
+                  :style {:color "teal"}})
         (d/br)
         (d/br)
         (d/button
