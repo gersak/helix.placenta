@@ -535,10 +535,10 @@
                            (let [node ^js @shape-ref
                                  scaleX (.scaleX node)
                                  scaleY (.scaleY node)]
-                             (.scaleX node 1)
-                             (.scaleY node 1)
                              (onChange {:x (.x node)
                                         :y (.y node)
+                                        :scaleX 1
+                                        :scaleY 1
                                         :width (max 10 (* (.width node) scaleX))
                                         :height (max 10 (* (.height node) scaleY))
                                         :offsetX (/ (max 10 (* (.width node) scaleX)) 2)
@@ -618,14 +618,14 @@
          :y 250
          :offsetX 250
          :offsetY 250
-         :scaleX layer-zoom
-         :scaleY layer-zoom
-         :onWheel (fn [e] (handle-scroll e layer-zoom set-layer-zoom))}
+         :scaleX (float layer-zoom)
+         :scaleY (float layer-zoom)
+         :onWheel (fn [e] (handle-scroll e (float layer-zoom) set-layer-zoom))}
         ($ avatar-render
            {:avatar avatar
             :selected selected
             :onSelect (fn [ref] (select! ref))
-            :onChange (fn [delta] (set-avatar! merge delta))}))
+            :onChange (fn [delta]  (set-avatar! merge delta))}))
        (konva/Layer
         (konva/Rect
          {:x -50
@@ -656,16 +656,16 @@
         (d/button
          {:className "button"
           :onClick (fn []
+                     (set-layer-zoom 0.5)
                      (set-avatar! merge
                                   {:image image-load
-                                   #_:offsetX #_(if (= image-load js/undefined) 0
-                                                    (/ (.-width image-load) 2))
-                                   #_:offsetY #_(if (= image-load js/undefined) 0
-                                                    (/ (.-height image-load) 2))
-
+                                   :offsetX (if (= image-load js/undefined) 0
+                                                (/ (.-width image-load) 2))
+                                   :offsetY (if (= image-load js/undefined) 0
+                                                (/ (.-height image-load) 2))
                                    :rotation 0
-                                   #_:width #_250 #_(.-width image-load)
-                                   #_:height #_250 #_(.-height image-load)
+                                   :width (.-width image-load)
+                                   :height (.-height image-load)
                                    :scaleX (cond
                                              (> (.-width image-load) (.-height image-load)) (/ 500 (.-width image-load))
                                              :else (/ 500 (.-height image-load)))
@@ -675,11 +675,8 @@
                                    :x (if (= image-load js/undefined) 0
                                           250)
                                    :y (if (= image-load js/undefined) 0
-                                          250)
-                       ; manually calculated for stage 500x500 (numberOfPixels / 2)
-                                   })
-                     (set-layer-zoom 0.5))}
-         (str "Re-center"))
+                                          250)}))}
+         (str "Reset"))
         (d/br)
         (d/br)
         (d/button
@@ -725,13 +722,13 @@
           {:id "zoom-slider",
            :name "zoom-slider",
            :type "range",
-           :min "0.01",
-           :max "3",
+           :min 0.01,
+           :max 3,
            :step 0.01,
-           :value layer-zoom,
+           :value (float layer-zoom),
            :className "slider",
            :style {:width "70%"}
-           :onChange (fn [e] (set-layer-zoom (.-value (.-target e))))})
+           :onChange (fn [e] (set-layer-zoom (float (.-value (.-target e)))))})
          (d/label
           {:for "zoom-slider"
            :className "label"}
