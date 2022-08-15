@@ -3,6 +3,7 @@
   (:require
     [helix.core :refer [defhook]]
     [helix.hooks :as hooks]
+    helix.placenta.util
     ["styled-components"
      :refer [default createGlobalStyle ThemeProvider useTheme]
      :rename {default sc}]))

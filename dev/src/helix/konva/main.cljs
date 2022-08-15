@@ -8,10 +8,6 @@
    [helix.konva :as konva]
    [helix.image :refer [use-image]]))
 
-;
-; KONVA TESTING
-; 
-
 ; Basic premade shapes
 
 (defnc BasicShape []
@@ -283,15 +279,6 @@
         images))))))
 
 ; Export image (returns base64 string of image)
-
-(defn DownloadURI [uri, name]
-  (let [link (.createElement js/document "a")]
-    (.log js/console link)
-    #_(->js (.-download link name))
-    #_(->js (.-href link uri))
-    (.appendChild (.-body js/document) link)
-    (.click link)
-    (.removeChild (.-body js/document) link)))
 
 (defnc ExportImage []
   (let [width (/ (.-innerWidth js/window) 2)
@@ -595,7 +582,7 @@
                     :border "2px solid teal"}})
 
 (defnc avatar-editor []
-  (let [[{:keys [image rotation] :as avatar
+  (let [[{:keys [rotation] :as avatar
           :or {rotation 0}} set-avatar!] (hooks/use-state nil)
         [selected select!] (hooks/use-state nil)
         stage-ref (hooks/use-ref nil)
@@ -603,148 +590,148 @@
         [file set-file] (hooks/use-state nil)
         [image-load] (use-image file "anonymous")]
     (hooks/use-effect
-     [image-load]
-     (set-avatar! {:image image-load}))
+      [image-load]
+      (set-avatar! {:image image-load}))
     (<>
-     (d/div
-      {:style {:width "501px"}}
-      (konva/Stage
-       {:width 500
-        :height 500
-        :style {:border "1px solid black"}
-        :ref #(reset! stage-ref %)
-        :onMouseDown (fn [^js e]
-                       (when (= (.-target e) (.getStage (.-target e)))
-                         (select! nil)))}
-       (konva/Layer
-        {:x 250
-         :y 250
-         :offsetX 250
-         :offsetY 250
-         :scaleX (float layer-zoom)
-         :scaleY (float layer-zoom)
-         :onWheel (fn [e] (handle-scroll e (float layer-zoom) set-layer-zoom))}
-        ($ avatar-render
-           {:avatar avatar
-            :selected selected
-            :onSelect (fn [ref] (select! ref))
-            :onChange (fn [delta]  (set-avatar! merge delta))}))
-       (konva/Layer
-        (konva/Rect
-         {:x -50
-          :y -50
-          :visible true
-          :cornerRadius 200
-          :listening false
-          :width 600
-          :height 600
-          :strokeWidth 130,
-          :stroke "#000000bb"
-          :style {:z-index "10"}}))))
-     ($ button-css
-        (d/button
-         {:className "button"
-          :onClick (fn []
-                     (let [tr-elements (.-children (nth (.-children (.-current stage-ref)) 0))
-                           rect-elements (.-children (nth (.-children (.-current stage-ref)) 1))]
-                       (cond (= (count tr-elements) 2)
-                             (.hide (nth tr-elements 1)))
-                       (.hide (nth rect-elements 0))
-                       (download-uri (.toDataURL (.-current stage-ref)), "user-avatar.png", "image/png")
-                       (.log js/console (.toDataURL (.-current stage-ref)))
-                       (.show (nth rect-elements 0))
-                       (cond (= (count tr-elements) 2)
-                             (.show (nth tr-elements 1)))))}
-         (str "Download/log URI"))
-        (d/button
-         {:className "button"
-          :onClick (fn []
-                     (set-layer-zoom 0.5)
-                     (set-avatar! merge
-                                  {:image image-load
-                                   :offsetX (if (= image-load js/undefined) 0
-                                                (/ (.-width image-load) 2))
-                                   :offsetY (if (= image-load js/undefined) 0
-                                                (/ (.-height image-load) 2))
-                                   :rotation 0
-                                   :width (.-width image-load)
-                                   :height (.-height image-load)
-                                   :scaleX (cond
-                                             (> (.-width image-load) (.-height image-load)) (/ 500 (.-width image-load))
-                                             :else (/ 500 (.-height image-load)))
-                                   :scaleY (cond
-                                             (> (.-width image-load) (.-height image-load)) (/ 500 (.-width image-load))
-                                             :else (/ 500 (.-height image-load)))
-                                   :x (if (= image-load js/undefined) 0
-                                          250)
-                                   :y (if (= image-load js/undefined) 0
-                                          250)}))}
-         (str "Reset"))
-        (d/input {:id "input"
-                  :name "input"
-                  :type "file"
-                  :accept ".png, .jpg, .jpeg, .svg"
-                  :onChange (fn [e]
-                              (cond (not (nil? (-> e .-target .-files)))
-                                    (let [URL (.-URL js/window)
-                                          url (.createObjectURL URL (-> e .-target .-files (aget 0)))
-                                          img (doto (.createElement js/document "img")
-                                                (set! -src url))]
-                                      (set-file (.-src img)))))
-                  :style {:color "teal"}})
-        (d/br)
-        (d/br)
-        (d/button
-         {:className "button"
-          :onClick (fn []
-                     (set-avatar! assoc :rotation (if (> (- rotation 90) 0) (- rotation 90) 0)))}
-         "Left")
-        (d/button
-         {:className "button"
-          :onClick (fn []
-                     (set-avatar! assoc :rotation (if (< (+ rotation 90) 360) (+ rotation 90) 360)))}
-         "Right"))
+      (d/div
+        {:style {:width "501px"}}
+        (konva/Stage
+          {:width 500
+           :height 500
+           :style {:border "1px solid black"}
+           :ref #(reset! stage-ref %)
+           :onMouseDown (fn [^js e]
+                          (when (= (.-target e) (.getStage (.-target e)))
+                            (select! nil)))}
+          (konva/Layer
+            {:x 250
+             :y 250
+             :offsetX 250
+             :offsetY 250
+             :scaleX (float layer-zoom)
+             :scaleY (float layer-zoom)
+             :onWheel (fn [e] (handle-scroll e (float layer-zoom) set-layer-zoom))}
+            ($ avatar-render
+               {:avatar avatar
+                :selected selected
+                :onSelect (fn [ref] (select! ref))
+                :onChange (fn [delta]  (set-avatar! merge delta))}))
+          (konva/Layer
+            (konva/Rect
+              {:x -50
+               :y -50
+               :visible true
+               :cornerRadius 200
+               :listening false
+               :width 600
+               :height 600
+               :strokeWidth 130,
+               :stroke "#000000bb"
+               :style {:z-index "10"}}))))
+      ($ button-css
+         (d/button
+           {:className "button"
+            :onClick (fn []
+                       (let [tr-elements (.-children (nth (.-children (.-current stage-ref)) 0))
+                             rect-elements (.-children (nth (.-children (.-current stage-ref)) 1))]
+                         (cond (= (count tr-elements) 2)
+                               (.hide (nth tr-elements 1)))
+                         (.hide (nth rect-elements 0))
+                         (download-uri (.toDataURL (.-current stage-ref)), "user-avatar.png", "image/png")
+                         (.log js/console (.toDataURL (.-current stage-ref)))
+                         (.show (nth rect-elements 0))
+                         (cond (= (count tr-elements) 2)
+                               (.show (nth tr-elements 1)))))}
+           (str "Download/log URI"))
+         (d/button
+           {:className "button"
+            :onClick (fn []
+                       (set-layer-zoom 0.5)
+                       (set-avatar! merge
+                         {:image image-load
+                          :offsetX (if (= image-load js/undefined) 0
+                                     (/ (.-width image-load) 2))
+                          :offsetY (if (= image-load js/undefined) 0
+                                     (/ (.-height image-load) 2))
+                          :rotation 0
+                          :width (.-width image-load)
+                          :height (.-height image-load)
+                          :scaleX (cond
+                                    (> (.-width image-load) (.-height image-load)) (/ 500 (.-width image-load))
+                                    :else (/ 500 (.-height image-load)))
+                          :scaleY (cond
+                                    (> (.-width image-load) (.-height image-load)) (/ 500 (.-width image-load))
+                                    :else (/ 500 (.-height image-load)))
+                          :x (if (= image-load js/undefined) 0
+                               250)
+                          :y (if (= image-load js/undefined) 0
+                               250)}))}
+           (str "Reset"))
+         (d/input {:id "input"
+                   :name "input"
+                   :type "file"
+                   :accept ".png, .jpg, .jpeg, .svg"
+                   :onChange (fn [e]
+                               (cond (not (nil? (-> e .-target .-files)))
+                                 (let [URL (.-URL js/window)
+                                       url (.createObjectURL URL (-> e .-target .-files (aget 0)))
+                                       img (doto (.createElement js/document "img")
+                                             (set! -src url))]
+                                   (set-file (.-src img)))))
+                   :style {:color "teal"}})
+         (d/br)
+         (d/br)
+         (d/button
+           {:className "button"
+            :onClick (fn []
+                       (set-avatar! assoc :rotation (if (> (- rotation 90) 0) (- rotation 90) 0)))}
+           "Left")
+         (d/button
+           {:className "button"
+            :onClick (fn []
+                       (set-avatar! assoc :rotation (if (< (+ rotation 90) 360) (+ rotation 90) 360)))}
+           "Right"))
 
-     ($ slider-css
-        (d/br)
-        (d/div
-         {:className "slidercontainer"}
-         (d/label
-          {:for "rotation-slider",
-           :className "label"}
-          "Rotation  ")
-         (d/input
-          {:id "rotation-slider",
-           :name "rotation-slider",
-           :type "range",
-           :min "0",
-           :max "360",
-           :value rotation,
-           :className "slider",
-           :style {:width "70%"}
-           :onChange (fn [e] (set-avatar! assoc :rotation (or (int (.-value (.-target e))) 0)))})
-         (d/label
-          {:for "rotation-slider"
-           :className "label"} (str "  " rotation "°")))
-        (d/br)
-        (d/div
-         {:className "slidercontainer"}
-         (d/label
-          {:for "zoom-slider",
-           :className "label"}
-          (str "Zooming   "))
-         (d/input
-          {:id "zoom-slider",
-           :name "zoom-slider",
-           :type "range",
-           :min 0.01,
-           :max 3,
-           :step 0.01,
-           :value (float layer-zoom),
-           :className "slider",
-           :style {:width "70%"}
-           :onChange (fn [e] (set-layer-zoom (float (.-value (.-target e)))))})
-         (d/label
-          {:for "zoom-slider"
-           :className "label"}
-          (str "  " (int (* layer-zoom 100)) "%")))))))
+      ($ slider-css
+         (d/br)
+         (d/div
+           {:className "slidercontainer"}
+           (d/label
+             {:for "rotation-slider",
+              :className "label"}
+             "Rotation  ")
+           (d/input
+             {:id "rotation-slider",
+              :name "rotation-slider",
+              :type "range",
+              :min "0",
+              :max "360",
+              :value rotation,
+              :className "slider",
+              :style {:width "70%"}
+              :onChange (fn [e] (set-avatar! assoc :rotation (or (int (.-value (.-target e))) 0)))})
+           (d/label
+             {:for "rotation-slider"
+              :className "label"} (str "  " rotation "°")))
+         (d/br)
+         (d/div
+           {:className "slidercontainer"}
+           (d/label
+             {:for "zoom-slider",
+              :className "label"}
+             (str "Zooming   "))
+           (d/input
+             {:id "zoom-slider",
+              :name "zoom-slider",
+              :type "range",
+              :min 0.01,
+              :max 3,
+              :step 0.01,
+              :value (float layer-zoom),
+              :className "slider",
+              :style {:width "70%"}
+              :onChange (fn [e] (set-layer-zoom (float (.-value (.-target e)))))})
+           (d/label
+             {:for "zoom-slider"
+              :className "label"}
+             (str "  " (int (* layer-zoom 100)) "%")))))))
