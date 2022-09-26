@@ -6,6 +6,32 @@
 
 (declare defstyled)
 
+; (defmacro defstyled
+;   "Macro takes style name component type and default style
+;   as input. In addition mixins can be used to compute additional
+;   style attributes where mixins are pure fn that will receive
+;   props converted by cljs-bean.core/->clj function."
+;   [cname ctype cstyle & mixins]
+;   (let [props-sym (gensym "props")
+;         _ns (str *ns*)]
+;     (if (not-empty mixins)
+;       `(def ~cname
+;          (helix.styled-components/styled
+;            ~ctype
+;            (fn [~props-sym]
+;              (let [clj-props# (assoc 
+;                                 (cljs-bean.core/->clj ~props-sym)
+;                                 :helix.styled-components/component (symbol ~_ns '~cname))] 
+;                (cljs-bean.core/->js
+;                  (reduce 
+;                    helix.placenta.util/deep-merge
+;                    ~cstyle 
+;                    ((juxt ~@mixins) clj-props#)))))))
+;       `(def ~cname
+;          (helix.styled-components/styled
+;            ~ctype
+;            (fn [~props-sym] (cljs-bean.core/->js ~cstyle)))))))
+
 (defmacro defstyled
   "Macro takes style name component type and default style
   as input. In addition mixins can be used to compute additional
@@ -16,7 +42,7 @@
         _ns (str *ns*)]
     (if (not-empty mixins)
       `(def ~cname
-         ((helix.styled-components/styled ~ctype)
+         ((helix.styled-components/get-styled-constructor ~ctype)
           (fn [~props-sym]
             (let [clj-props# (assoc 
                                (cljs-bean.core/->clj ~props-sym)
@@ -27,7 +53,8 @@
                   ~cstyle 
                   ((juxt ~@mixins) clj-props#)))))))
       `(def ~cname
-         ((helix.styled-components/styled ~ctype) (fn [~props-sym] (cljs-bean.core/->js ~cstyle)))))))
+         ((helix.styled-components/get-styled-constructor ~ctype)
+          (fn [~props-sym] (cljs-bean.core/->js ~cstyle)))))))
 
 
 (defmacro import-resource
