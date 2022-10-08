@@ -8,7 +8,6 @@
 
 
 (def styled default)
-
 ;; get-styled-constructor is required for advanced compilation
 ;; Don't remove if you aren't sure what you are doing
 (defn get-styled-constructor [type] (default type))
