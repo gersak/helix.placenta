@@ -5,18 +5,23 @@
     [helix.hooks :as hooks]
     helix.placenta.util
     ["styled-components"
-     :refer [default createGlobalStyle ThemeProvider useTheme]
-     :rename {default sc}]))
+     :refer [default createGlobalStyle ThemeProvider useTheme isStyledComponent]]))
 
 
-(def styled sc)
+(def styled default)
+;; get-styled-constructor is required for advanced compilation
+;; Don't remove if you aren't sure what you are doing
+(defn get-styled-constructor [type] (default type))
+
+
+(defn styled? [x] (isStyledComponent x))
 (def global-style createGlobalStyle)
 (def theme-provider ThemeProvider)
 (declare defstyled)
 
 
 (defmulti --themed
-  (fn [{:keys [theme helix.styled-components/component]}]
+  (fn [{:keys [theme ::component]}]
     [theme component]))
 
 
@@ -37,5 +42,5 @@
 
 
 (defmethod --themed :default
-  [{:keys [theme helix.styled-components/component]}]
+  [{:keys [theme ::component]}]
   (.warn js/console (str "Couldn't generate --themed mixin for [theme, component] " [theme  component])))

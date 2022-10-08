@@ -200,8 +200,6 @@
 
 
 #?(:cljs (defonce AnimatePresence motion/AnimatePresence))
-(comment
-  (.log js/console AnimatePresence))
 
 
 #?(:clj (defn gen-tag
