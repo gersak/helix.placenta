@@ -9,6 +9,5 @@
 
 (hx/defhook use-image
   "Like React useImage, except both of the arguments are required (url and crossOrigin)."
-  ([url, crossOrigin]
-   (let [tmp (image url crossOrigin)]
-     [(first tmp) (second tmp)])))
+  ([url crossOrigin]
+   (image url crossOrigin)))

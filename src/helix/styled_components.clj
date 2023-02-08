@@ -21,15 +21,16 @@
           (fn [~props-sym]
             (let [clj-props# (assoc 
                                (cljs-bean.core/->clj ~props-sym)
-                               :helix.styled-components/component (symbol ~_ns '~cname))] 
+                               :helix.styled-components/component (symbol ~_ns '~cname))]
               (cljs-bean.core/->js
                 (reduce 
                   helix.placenta.util/deep-merge
                   ~cstyle 
                   ((juxt ~@mixins) clj-props#)))))))
       `(def ~cname
-         ((helix.styled-components/get-styled-constructor ~ctype)
-          (fn [~props-sym] (cljs-bean.core/->js ~cstyle)))))))
+         (let [style# (cljs-bean.core/->js ~cstyle)]
+           ((helix.styled-components/get-styled-constructor ~ctype)
+            (fn [] style#)))))))
 
 
 (defmacro import-resource

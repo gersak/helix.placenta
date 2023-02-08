@@ -471,9 +471,9 @@
 
 ; Simple avatar editor (combined image export and transform) - rotate, drag, zoom
 
-(defnc avatar-render
+(defnc AvatarImage
   [{:keys [selected onSelect onChange]
-    {:keys [width image] :as avatar} :avatar}]
+    {:keys [image] :as avatar} :avatar}]
   (let [shape-ref (hooks/use-ref nil)
         tr-ref (hooks/use-ref nil)
         selected? (and
@@ -483,13 +483,13 @@
     (hooks/use-effect
      [image selected?]
      (when (and selected? image)
-       (.nodes ^js  @tr-ref #js [@shape-ref])
+       (.nodes ^js @tr-ref #js [@shape-ref])
        (.batchDraw ^js (.getLayer @tr-ref))))
     (hooks/use-effect
      [image]
      (when (and
-            (not selected?)
             (some? image)
+            (not selected?)
             (some? @shape-ref))
        (onSelect @shape-ref)))
     (when image
@@ -535,12 +535,12 @@
                                         :offsetY (/ (max 10 (* (.height node) scaleY)) 2)})))})
        (when selected?
          (konva/Transformer
-          {:ref #(reset! tr-ref %),
-           :centeredScaling true,
-           :rotateEnabled false,
-           :boundBoxFunc (fn [old-box, new-box]
-                           (if (or (< (.-width new-box) 5) (< (.-height new-box) 5))
-                             old-box new-box))}))))))
+           {:ref #(reset! tr-ref %)
+            :centeredScaling true
+            :rotateEnabled false
+            :boundBoxFunc (fn [old-box new-box]
+                            (if (or (< (.-width new-box) 5) (< (.-height new-box) 5))
+                              old-box new-box))}))))))
 
 
 ; vertical image https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png/800px-Polignano_a_Mare_-_Isola_di_San_Paolo_-_startrail.png
@@ -581,7 +581,7 @@
                     :color "teal"
                     :border "2px solid teal"}})
 
-(defnc avatar-editor []
+(defnc AvatarEditor []
   (let [[{:keys [rotation] :as avatar
           :or {rotation 0}} set-avatar!] (hooks/use-state nil)
         [selected select!] (hooks/use-state nil)
@@ -611,7 +611,7 @@
              :scaleX (float layer-zoom)
              :scaleY (float layer-zoom)
              :onWheel (fn [e] (handle-scroll e (float layer-zoom) set-layer-zoom))}
-            ($ avatar-render
+            ($ AvatarImage
                {:avatar avatar
                 :selected selected
                 :onSelect (fn [ref] (select! ref))
